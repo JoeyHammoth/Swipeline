@@ -6,3 +6,11 @@ packages:
 # install time and the build toolchain needs it.
 allowBuilds:
   esbuild: true
+
+# Dependabot alerts on 2026-11-24: Vite dev-server advisories (one high) and an
+# esbuild dev-server advisory. Both are dev-only, but the fixes are patch-level
+# and the docs build exercises Vite, so they are pinned forward rather than
+# dismissed. Revisit if VitePress stops supporting this Vite major.
+overrides:
+  vite: ^6.4.4
+  'esbuild@<0.25.0': ^0.25.0
