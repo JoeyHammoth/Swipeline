@@ -1,0 +1,8 @@
+packages:
+  - "packages/*"
+
+# pnpm 12 reads dependency build policy from this file. Keep the allowlist
+# minimal and reviewed: esbuild downloads/verifies its platform binary at
+# install time and the build toolchain needs it.
+allowBuilds:
+  esbuild: true

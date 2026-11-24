@@ -1,0 +1,47 @@
+{
+  "name": "swipeline",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Swipe-first discovery toolkit: any source, a ranked deck, a portable history.",
+  "license": "Apache-2.0",
+  "packageManager": "pnpm@12.23.0",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build": "pnpm --filter \"./packages/**\" -r run build",
+    "dev": "pnpm --filter \"./packages/**\" -r --parallel run dev",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "pnpm --filter \"./packages/**\" -r run typecheck",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "publint": "pnpm -r --filter \"./packages/**\" exec publint",
+    "attw": "pnpm -r --filter \"./packages/**\" exec attw --pack .",
+    "check:boundaries": "node scripts/check-boundaries.mjs",
+    "licenses:check": "node scripts/check-licenses.mjs",
+    "schemas:export": "pnpm --filter @swipeline/core run schemas:export",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
+    "changeset": "changeset",
+    "changeset:status": "changeset status --since=origin/main",
+    "release": "pnpm build && changeset publish"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
+    "@biomejs/biome": "^2.6.8",
+    "@changesets/cli": "^3.0.3",
+    "@types/node": "^26.6.6",
+    "@vitest/coverage-v8": "^5.1.1",
+    "fast-check": "^4.11.0",
+    "publint": "^0.3.25",
+    "tsup": "^9.0.0",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.1",
+    "vitepress": "^1.6.4"
+  }
+}
