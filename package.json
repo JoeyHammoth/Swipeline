@@ -20,7 +20,7 @@
     "format": "biome format --write .",
     "format:check": "biome format .",
     "publint": "pnpm -r --filter \"./packages/**\" exec publint",
-    "attw": "pnpm -r --filter \"./packages/**\" exec attw --pack .",
+    "attw": "pnpm -r --filter \"./packages/**\" exec attw --pack . --exclude-entrypoints ./styles.css",
     "check:boundaries": "node scripts/check-boundaries.mjs",
     "licenses:check": "node scripts/check-licenses.mjs",
     "schemas:export": "pnpm --filter @swipeline/core run schemas:export",
@@ -31,7 +31,8 @@
     "changeset:status": "changeset status --since=origin/main",
     "release": "pnpm build && changeset publish",
     "api:docs": "node scripts/api-reference.mjs",
-    "docs:links": "node scripts/check-docs-links.mjs"
+    "docs:links": "node scripts/check-docs-links.mjs",
+    "bench:gate": "vitest run packages/bench/test/bench.test.ts"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",

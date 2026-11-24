@@ -35,10 +35,10 @@ work starts.
 
 ## M2 — v0.2: ranking and adapters
 
-- `embed` (Transformers.js and OpenAI-compatible), `vector` (brute force + `sqlite-vec` driver)
-- `thompson` and `explain` stages; `bench` harness gating CI
-- Adapters: arXiv, Open Library, TheMealDB, TMDB; adapter testkit and template
-- `element` Web Component and `binding-testkit` conformance suite v1
+- [x] `embed` (Transformers.js and OpenAI-compatible), `vector` (brute force + `sqlite-vec` driver)
+- [x] `thompson` and `explain` stages; `bench` harness gating CI
+- [x] Adapters: arXiv, Open Library, TheMealDB, TMDB; adapter testkit and template
+- [x] `element` Web Component and `binding-testkit` conformance suite v1
 - Acceptance: default pipeline beats random and popularity baselines by the
   documented margin; React and the Web Component pass conformance; SSR smoke passes
 

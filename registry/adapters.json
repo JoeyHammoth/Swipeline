@@ -2,5 +2,58 @@
   "$schema": "./schema.json",
   "version": 1,
   "updatedAt": "2026-11-24",
-  "adapters": []
+  "adapters": [
+    {
+      "name": "openlibrary",
+      "package": "@swipeline/adapter-openlibrary",
+      "description": "Open Library search results as book cards, with covers and subject tags.",
+      "source": "https://openlibrary.org/developers/api",
+      "repo": "https://github.com/JoeyHammoth/Swipeline/tree/main/packages/adapter-openlibrary",
+      "license": "Apache-2.0",
+      "maintainers": ["JoeyHammoth"],
+      "attributionRequired": true,
+      "rateLimitNotes": "No published hard limit; cache search pages and send a descriptive User-Agent.",
+      "termsUrl": "https://openlibrary.org/developers/api",
+      "conformance": "passing"
+    },
+    {
+      "name": "themealdb",
+      "package": "@swipeline/adapter-themealdb",
+      "description": "TheMealDB recipes as cards with images, cuisine, category and instructions.",
+      "source": "https://www.themealdb.com/api.php",
+      "repo": "https://github.com/JoeyHammoth/Swipeline/tree/main/packages/adapter-themealdb",
+      "license": "Apache-2.0",
+      "maintainers": ["JoeyHammoth"],
+      "attributionRequired": true,
+      "rateLimitNotes": "Free development key is rate limited; apply for a production key.",
+      "termsUrl": "https://www.themealdb.com/api.php",
+      "conformance": "passing"
+    },
+    {
+      "name": "arxiv",
+      "package": "@swipeline/adapter-arxiv",
+      "description": "arXiv Atom entries as paper cards with authors, abstract and categories.",
+      "source": "https://info.arxiv.org/help/api/index.html",
+      "repo": "https://github.com/JoeyHammoth/Swipeline/tree/main/packages/adapter-arxiv",
+      "license": "Apache-2.0",
+      "maintainers": ["JoeyHammoth"],
+      "attributionRequired": true,
+      "rateLimitNotes": "At most one request every three seconds; identify the client.",
+      "termsUrl": "https://info.arxiv.org/help/api/tou.html",
+      "conformance": "passing"
+    },
+    {
+      "name": "tmdb",
+      "package": "@swipeline/adapter-tmdb",
+      "description": "TMDB movies as cards with posters, genres, ratings and release dates.",
+      "source": "https://developer.themoviedb.org/docs",
+      "repo": "https://github.com/JoeyHammoth/Swipeline/tree/main/packages/adapter-tmdb",
+      "license": "Apache-2.0",
+      "maintainers": ["JoeyHammoth"],
+      "attributionRequired": true,
+      "rateLimitNotes": "Requires a key; do not ship it in a browser bundle.",
+      "termsUrl": "https://www.themoviedb.org/documentation/api/terms-of-use",
+      "conformance": "passing"
+    }
+  ]
 }

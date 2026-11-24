@@ -1,0 +1,27 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": [],
+    "paths": {
+      "@swipeline/core": ["../../packages/core/src/index.ts"],
+      "@swipeline/gestures": ["../../packages/gestures/src/index.ts"],
+      "@swipeline/adapter-testkit": ["../../packages/adapter-testkit/src/index.ts"],
+      "@swipeline/adapter-http-json": ["../../packages/adapter-http-json/src/index.ts"],
+      "@swipeline/store-memory": ["../../packages/store-memory/src/index.ts"],
+      "@swipeline/store-indexeddb": ["../../packages/store-indexeddb/src/index.ts"],
+      "@swipeline/rank": ["../../packages/rank/src/index.ts"],
+      "@swipeline/bench": ["../../packages/bench/src/index.ts"],
+      "@swipeline/react": ["../../packages/react/src/index.ts"],
+      "@swipeline/embed": ["../../packages/embed/src/index.ts"],
+      "@swipeline/vector": ["../../packages/vector/src/index.ts"],
+      "@swipeline/adapter-openlibrary": ["../../packages/adapter-openlibrary/src/index.ts"],
+      "@swipeline/adapter-themealdb": ["../../packages/adapter-themealdb/src/index.ts"],
+      "@swipeline/adapter-arxiv": ["../../packages/adapter-arxiv/src/index.ts"],
+      "@swipeline/adapter-tmdb": ["../../packages/adapter-tmdb/src/index.ts"],
+      "@swipeline/element": ["../../packages/element/src/index.ts"],
+      "@swipeline/binding-testkit": ["../../packages/binding-testkit/src/index.ts"],
+      "@swipeline/store-memory/conformance": ["../../packages/store-memory/src/conformance.ts"]
+    }
+  },
+  "include": ["src/**/*.ts", "test/**/*.ts"]
+}

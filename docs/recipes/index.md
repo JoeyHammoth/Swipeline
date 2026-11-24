@@ -80,6 +80,33 @@ Template: `facts` with rent, size and commute. Sensitive-category care applies:
 housing preferences can correlate with protected characteristics, so server-side
 profiling needs a legal review.
 
+## Restaurants — a user-owned CSV export
+
+```ts
+source: csvAdapter({
+  id: 'my-restaurants',
+  path: './restaurants.csv',
+  map: {
+    id: 'id',
+    title: 'name',
+    subtitle: 'cuisine + " · " + neighborhood',
+    tags: 'cuisine',
+    facts: [
+      { label: 'Price', value: 'price', unit: 'USD' },
+      { label: 'Rating', value: 'rating', unit: '/5' },
+    ],
+  },
+})
+```
+
+Template: `facts`. Keep price and rating in `facts`, not in the title, so a
+template can reformat them. A hard filter on price belongs before ranking: a
+perfect restaurant outside the budget is noise, and no score should resurrect it.
+
+The privacy trade-off is the point: a file the user owns means no third-party
+terms, no API key and no network request. It also means the user is responsible
+for the data; do not upload it to a server without consent.
+
 ## Anything else
 
 The pattern is always: map to `Card`, pick a template, pick a store, choose a

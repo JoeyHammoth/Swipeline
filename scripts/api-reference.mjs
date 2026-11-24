@@ -99,12 +99,20 @@ function collect(file, only = null) {
   return result
 }
 
+function escapeCell(value) {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('|', '\\|')
+}
+
 function tableRows(symbols) {
   return [...symbols.keys()]
     .sort((a, b) => a.localeCompare(b))
     .map((name) => {
       const { kind, summary } = symbols.get(name)
-      return `| \`${name}\` | ${kind} | ${summary.replaceAll('|', '\\|')} |`
+      return `| \`${name}\` | ${kind} | ${escapeCell(summary)} |`
     })
 }
 
@@ -129,7 +137,7 @@ for (const dir of packageDirs) {
   visited.clear()
   const symbols = collect(entry, null)
   lines.push(`## \`${manifest.name}\``, '')
-  if (manifest.description) lines.push(manifest.description, '')
+  if (manifest.description) lines.push(escapeCell(manifest.description), '')
   const rows = tableRows(symbols)
   if (rows.length === 0) lines.push('_No exports._', '')
   else lines.push('| Symbol | Kind | Summary |', '| --- | --- | --- |', ...rows, '')

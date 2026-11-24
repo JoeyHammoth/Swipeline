@@ -61,7 +61,7 @@ a fixed order. Real products usually want their own markup.
 ```
 
 The element fills `data-field` nodes from the current card. Styling goes through
-CSS custom properties and `::part()`; see the theming tokens.
+CSS custom properties and `::part()`; see the [theming reference](/reference/theming).
 
 ## Rules that keep templates portable
 
@@ -76,6 +76,9 @@ CSS custom properties and `::part()`; see the theming tokens.
    repeat the title.
 
 ## Theming tokens
+
+The full table, dark-mode values and a worked override live in the
+[theming reference](/reference/theming). The short version:
 
 | Token | Purpose |
 |---|---|

@@ -6,7 +6,8 @@
     "paths": {
       "@swipeline/core": ["../../packages/core/src/index.ts"],
       "@swipeline/gestures": ["../../packages/gestures/src/index.ts"],
-      "@swipeline/react": ["../../packages/react/src/index.tsx"]
+      "@swipeline/react": ["../../packages/react/src/index.tsx"],
+      "@swipeline/binding-testkit": ["../../packages/binding-testkit/src/index.ts"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "test/**/*.ts", "test/**/*.tsx"]

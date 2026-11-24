@@ -47,6 +47,9 @@ jobs:
       - name: Unit and property tests
         run: pnpm test -- --coverage
 
+      - name: Ranking benchmark gate
+        run: pnpm bench:gate
+
       - name: Build packages
         run: pnpm build
 

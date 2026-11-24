@@ -1,0 +1,23 @@
+{
+  "meals": [
+    {
+      "idMeal": "52771",
+      "strMeal": "Spicy Arrabiata Penne",
+      "strCategory": "Pasta",
+      "strArea": "Italian",
+      "strInstructions": "Bring a large pot of water to a boil. Add the penne and cook until al dente. Meanwhile, heat the oil and garlic, add the tomatoes and chilli, then toss the drained pasta through the sauce.",
+      "strMealThumb": "https://www.themealdb.com/images/media/meals/ustsqw1468250014.jpg",
+      "strTags": "Pasta,Spicy",
+      "strSource": "https://www.themealdb.com/meal/52771"
+    },
+    {
+      "idMeal": "52772",
+      "strMeal": "Teriyaki Chicken Casserole",
+      "strCategory": "Chicken",
+      "strArea": "Japanese",
+      "strInstructions": "Preheat oven to 350 degrees. Combine soy sauce, water, sugar, ginger and garlic in a saucepan.",
+      "strMealThumb": "https://www.themealdb.com/images/media/meals/wvpsxx1468256321.jpg",
+      "strTags": "Chicken"
+    }
+  ]
+}

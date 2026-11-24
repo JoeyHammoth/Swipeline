@@ -1,0 +1,22 @@
+{
+  "numFound": 2,
+  "docs": [
+    {
+      "key": "/works/OL123W",
+      "title": "Project Hail Mary",
+      "author_name": ["Andy Weir"],
+      "subject": ["Science Fiction", "Space", "Survival"],
+      "first_sentence": ["I am the only survivor."],
+      "cover_i": 987654,
+      "first_publish_year": 2021
+    },
+    {
+      "key": "/works/OL456W",
+      "title": "The Left Hand of Darkness",
+      "author_name": ["Ursula K. Le Guin"],
+      "subject": ["Science Fiction", "Gender"],
+      "cover_i": 123456,
+      "first_publish_year": 1969
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "page": 1,
+  "total_pages": 2,
+  "results": [
+    {
+      "id": 550,
+      "title": "Fight Club",
+      "overview": "A ticking-time-bomb insomniac and a slippery soap salesman channel primal male aggression into a shocking new form of therapy.",
+      "release_date": "1999-10-15",
+      "poster_path": "/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg",
+      "vote_average": 8.438,
+      "vote_count": 29000,
+      "genre_ids": [18, 53]
+    },
+    {
+      "id": 603,
+      "title": "The Matrix",
+      "overview": "A computer hacker learns from mysterious rebels about the true nature of his reality.",
+      "release_date": "1999-03-31",
+      "poster_path": "/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg",
+      "vote_average": 8.2,
+      "vote_count": 25000,
+      "genre_ids": [28, 878]
+    }
+  ]
+}
