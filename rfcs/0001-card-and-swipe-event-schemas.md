@@ -1,10 +1,14 @@
 # RFC 0001: Card, SwipeEvent and Profile schemas
 
-- **Status:** proposed
+- **Status:** accepted (2026-11-24)
 - **Author(s):** Swipeline maintainers
 - **Date:** 2026-11-24
 - **Affects:** `@swipeline/core`, every adapter, the event log format, the docs
   JSON Schema, the server API
+- **Decision:** accepted on 2026-11-24 after implementation in `packages/core`
+  (Zod schemas, id helpers, `rebuildProfile`, JSON Schema export, 34 tests
+  including fast-check invariants). Revisions follow the RFC process: a new
+  RFC supersedes this one rather than editing the contract in place.
 
 ## Problem
 
