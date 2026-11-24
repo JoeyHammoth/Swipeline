@@ -4,7 +4,7 @@
 
 | | |
 |---|---|
-| **Status** | Draft v0.2 (adds the framework-agnostic plan in 5.8.1 and the repository security checklist in 10.6) |
+| **Status** | Draft v0.3 (M0 resolutions: research verification, ADRs, architecture contracts and resolved open questions — see [decisions](decisions/open-questions.md)) |
 | **Date** | 2026-11-24 |
 | **Working name** | Swipeline (see [section 17](#17-naming) for alternatives and the name-check checklist) |
 | **Proposed license** | Apache-2.0 (see [section 10](#10-open-source-project-setup)) |
@@ -1465,10 +1465,10 @@ Time estimates are indicative for a small team working part-time; a single part-
 
 ### 17.3 Name-check checklist (do before creating the org)
 
-- [ ] GitHub organization and repo name available
-- [ ] npm scope `@swipeline` and unscoped names (`swipeline`, `create-swipeline`, `swipeline-adapter-*`) available
-- [ ] PyPI and pub.dev names (reserve defensively if a future client is planned)
-- [ ] Domain (for example `swipeline.dev`) and social handles
+- [x] GitHub organization and repo name available (repo exists; `swipeline` org name is free)
+- [x] npm scope `@swipeline` and unscoped names (`swipeline`, `create-swipeline`, `swipeline-adapter-*`) available — all 404 on the registry, 2026-11-24
+- [x] PyPI `swipeline` available; pub.dev not checked (no client planned)
+- [ ] Domain (for example `swipeline.dev`) and social handles — no site responding on 2026-11-24, registration is an open task
 - [ ] Web search for the name plus "swipe", "app", "library" shows no conflicting product
 - [ ] Trademark database search in your main jurisdictions for software classes
 - [ ] Pronunciation and spelling test with a few developers
@@ -1477,16 +1477,20 @@ Time estimates are indicative for a small team working part-time; a single part-
 
 ## 18. Open questions and decisions needed
 
-1. **Name:** confirm Swipeline or choose an alternative after the checklist in 17.3.
-2. **License:** Apache-2.0 (recommended) versus MIT. Decide **before** accepting outside contributions.
-3. **Contribution terms:** DCO (recommended) versus a CLA, which matters only if you may want to relicense.
-4. **Ownership:** personal account versus a GitHub organization from day one.
-5. **First UI target:** React web plus the vanilla `gestures` module in v0.1, with the Web Component in M2 (recommended), versus adding React Native from the start.
-6. **Embeddings in v0.2:** ship only a local Transformers.js provider, or also an OpenAI-compatible provider at launch.
-7. **Server runtime:** commit to a runtime-agnostic framework (for example Hono) or Node-only.
-8. **Scope of the first-party adapter set:** which four to build first (suggested: arXiv, Open Library, a recipe API, a movie database), based on attribution and rate-limit terms.
-9. **Hosted offering:** explicitly out of scope for now, or leave the door open for a separate commercial layer later (this affects license and CLA choices).
-10. **Funding and sustainability:** GitHub Sponsors, a fiscal host, or none for now.
+> **Resolved in M0.** All ten questions below are decided, with reasoning, in
+> [`docs/decisions/open-questions.md`](decisions/open-questions.md). The original
+> questions are kept here as the record of what was open.
+
+1. **Name:** confirm Swipeline or choose an alternative after the checklist in 17.3. → **Swipeline**; npm, PyPI and GitHub-org names verified free on 2026-11-24 ([research](research/2026-11-m0-verification.md)). Trademark search still open.
+2. **License:** Apache-2.0 (recommended) versus MIT. Decide **before** accepting outside contributions. → **Apache-2.0** ([ADR-0007](adr/0007-apache-2-dco.md)).
+3. **Contribution terms:** DCO (recommended) versus a CLA, which matters only if you may want to relicense. → **DCO**, enforced in CI ([ADR-0007](adr/0007-apache-2-dco.md)).
+4. **Ownership:** personal account versus a GitHub organization from day one. → **Personal repo through M0**, transfer to the `swipeline` org before the first publish ([ADR-0010](adr/0010-repo-ownership-org-later.md)).
+5. **First UI target:** React web plus the vanilla `gestures` module in v0.1, with the Web Component in M2 (recommended), versus adding React Native from the start. → **React + `gestures` in v0.1, Web Component in M2** as the reference binding ([ADR-0013](adr/0013-web-component-reference-binding.md)).
+6. **Embeddings in v0.2:** ship only a local Transformers.js provider, or also an OpenAI-compatible provider at launch. → **Both**, both optional, neither in the default path ([ADR-0006](adr/0006-no-ml-default-ranking.md)).
+7. **Server runtime:** commit to a runtime-agnostic framework (for example Hono) or Node-only. → **Hono**, runtime-agnostic.
+8. **Scope of the first-party adapter set:** which four to build first (suggested: arXiv, Open Library, a recipe API, a movie database), based on attribution and rate-limit terms. → **arXiv, Open Library, TheMealDB, TMDB** (accepted suggestion; terms reviewed per adapter).
+9. **Hosted offering:** explicitly out of scope for now, or leave the door open for a separate commercial layer later (this affects license and CLA choices). → **Out of scope**; no relicensing plan, which is why DCO is sufficient ([ADR-0007](adr/0007-apache-2-dco.md)).
+10. **Funding and sustainability:** GitHub Sponsors, a fiscal host, or none for now. → **GitHub Sponsors after the first public release**; no fiscal host now.
 
 ---
 
