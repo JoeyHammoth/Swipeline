@@ -73,6 +73,14 @@ jobs:
           pnpm schemas:export
           git diff --exit-code -- docs/public/schemas
 
+      - name: API reference is up to date
+        run: |
+          pnpm api:docs
+          git diff --exit-code -- docs/reference/api.md
+
+      - name: Docs internal links resolve
+        run: pnpm docs:links
+
       - name: Changeset present
         if: matrix.node == 24 && github.event_name == 'pull_request'
         run: pnpm changeset status --since=origin/${{ github.base_ref }}

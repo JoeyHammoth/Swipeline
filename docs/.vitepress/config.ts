@@ -83,6 +83,7 @@ export default defineConfig({
           { text: 'Deck configuration', link: '/reference/config' },
           { text: 'CLI', link: '/reference/cli' },
           { text: 'Schemas', link: '/reference/schemas' },
+          { text: 'API reference', link: '/reference/api' },
           { text: 'Contracts', link: '/architecture/contracts' },
         ],
       },

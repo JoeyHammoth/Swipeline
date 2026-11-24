@@ -29,7 +29,9 @@
     "docs:preview": "vitepress preview docs",
     "changeset": "changeset",
     "changeset:status": "changeset status --since=origin/main",
-    "release": "pnpm build && changeset publish"
+    "release": "pnpm build && changeset publish",
+    "api:docs": "node scripts/api-reference.mjs",
+    "docs:links": "node scripts/check-docs-links.mjs"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
