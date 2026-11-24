@@ -1,7 +1,16 @@
 name: Dependency review
 
+# NOT on pull_request yet, deliberately.
+#
+# `actions/dependency-review-action` calls the dependency-graph compare API, which
+# returns 403 for this repository because the dependency graph has not resolved
+# (issue #27). Until it does, the working PR gate is
+# `pnpm audit --prod --audit-level=high` in ci.yml plus `pnpm licenses:check`.
+#
+# When the graph is available: add `pull_request:` back to `on:`, delete this
+# comment block, and confirm a fork PR fails on a vulnerable dependency.
 on:
-  pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -20,6 +29,5 @@ jobs:
       - uses: actions/dependency-review-action@v5
         with:
           fail-on-severity: moderate
-          # Copyleft and source-available licenses stay out of published packages.
           deny-licenses: GPL-2.0, GPL-3.0, AGPL-3.0, SSPL-1.0, BUSL-1.1
           comment-summary-in-pr: on-failure
