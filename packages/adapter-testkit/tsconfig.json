@@ -1,5 +1,19 @@
 {
   "extends": "../../tsconfig.base.json",
-  "compilerOptions": { "rootDir": ".", "outDir": "dist", "types": [] },
+  "compilerOptions": {
+    "types": [],
+    "paths": {
+      "@swipeline/core": ["../../packages/core/src/index.ts"],
+      "@swipeline/gestures": ["../../packages/gestures/src/index.ts"],
+      "@swipeline/adapter-testkit": ["../../packages/adapter-testkit/src/index.ts"],
+      "@swipeline/adapter-http-json": ["../../packages/adapter-http-json/src/index.ts"],
+      "@swipeline/store-memory": ["../../packages/store-memory/src/index.ts"],
+      "@swipeline/store-indexeddb": ["../../packages/store-indexeddb/src/index.ts"],
+      "@swipeline/rank": ["../../packages/rank/src/index.ts"],
+      "@swipeline/bench": ["../../packages/bench/src/index.ts"],
+      "@swipeline/react": ["../../packages/react/src/index.ts"],
+      "@swipeline/store-memory/conformance": ["../../packages/store-memory/src/conformance.ts"]
+    }
+  },
   "include": ["src/**/*.ts", "test/**/*.ts"]
 }

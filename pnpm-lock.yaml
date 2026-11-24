@@ -317,6 +317,47 @@ importers:
         specifier: ^5.1.1
         version: 5.1.1(@types/node@26.6.6)(@vitest/coverage-v8@5.1.1)(jsdom@31.0.1)(vite@6.4.6(@types/node@26.6.6)(lightningcss@1.33.0)(yaml@2.9.1))
 
+  packages/store-indexeddb:
+    dependencies:
+      '@swipeline/core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      fake-indexeddb:
+        specifier: ^6.2.5
+        version: 6.2.8
+      tsup:
+        specifier: ^9.0.0
+        version: 9.0.0(postcss@8.5.33)(typescript@7.0.2)(yaml@2.9.1)
+      typescript:
+        specifier: ^7.0.2
+        version: 7.0.2
+      vitest:
+        specifier: ^5.1.1
+        version: 5.1.1(@types/node@26.6.6)(@vitest/coverage-v8@5.1.1)(jsdom@31.0.1)(vite@6.4.6(@types/node@26.6.6)(lightningcss@1.33.0)(yaml@2.9.1))
+
+  packages/store-memory:
+    dependencies:
+      '@swipeline/core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      '@swipeline/store-indexeddb':
+        specifier: workspace:*
+        version: link:../store-indexeddb
+      fake-indexeddb:
+        specifier: ^6.2.5
+        version: 6.2.8
+      tsup:
+        specifier: ^9.0.0
+        version: 9.0.0(postcss@8.5.33)(typescript@7.0.2)(yaml@2.9.1)
+      typescript:
+        specifier: ^7.0.2
+        version: 7.0.2
+      vitest:
+        specifier: ^5.1.1
+        version: 5.1.1(@types/node@26.6.6)(@vitest/coverage-v8@5.1.1)(jsdom@31.0.1)(vite@6.4.6(@types/node@26.6.6)(lightningcss@1.33.0)(yaml@2.9.1))
+
 packages:
 
   '@algolia/abtesting@1.31.0':
