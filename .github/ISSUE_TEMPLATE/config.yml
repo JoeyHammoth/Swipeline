@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or usage help
+    url: https://github.com/JoeyHammoth/Swipeline/discussions
+    about: Ask in Discussions — questions are not issues.
+  - name: Report a security vulnerability
+    url: https://github.com/JoeyHammoth/Swipeline/security/advisories/new
+    about: Privately, never as a public issue. See SECURITY.md.
+  - name: Read the docs
+    url: https://joeyhammoth.github.io/Swipeline/
+    about: Quickstart, concepts, guides and the contract reference.

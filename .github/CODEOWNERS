@@ -1,0 +1,32 @@
+# CODEOWNERS
+#
+# One maintainer today, so every path points at the owner account. When area
+# maintainers exist, replace these with team handles (for example
+# @swipeline/core-maintainers). Team handles that do not exist make GitHub
+# silently ignore the entry, so keep this file to real accounts until then.
+
+*                                   @JoeyHammoth
+
+# Public API and schemas: reviewed by core owners even once areas split.
+/packages/core/                     @JoeyHammoth
+/rfcs/                              @JoeyHammoth
+
+# Security-sensitive paths.
+/SECURITY.md                        @JoeyHammoth
+/.github/workflows/                 @JoeyHammoth
+/.github/dependabot.yml             @JoeyHammoth
+/.github/CODEOWNERS                 @JoeyHammoth
+
+# Release and dependency policy.
+/.changeset/                        @JoeyHammoth
+/package.json                       @JoeyHammoth
+/pnpm-workspace.yaml                @JoeyHammoth
+/pnpm-lock.yaml                     @JoeyHammoth
+/scripts/check-licenses.mjs         @JoeyHammoth
+/scripts/check-boundaries.mjs       @JoeyHammoth
+
+# Docs and governance.
+/docs/                              @JoeyHammoth
+/GOVERNANCE.md                      @JoeyHammoth
+/CONTRIBUTING.md                    @JoeyHammoth
+/CODE_OF_CONDUCT.md                 @JoeyHammoth

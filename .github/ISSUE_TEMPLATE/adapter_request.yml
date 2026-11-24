@@ -1,0 +1,58 @@
+name: Adapter request
+description: Ask for a first-party source adapter, or propose a community one for the registry.
+title: "feat(adapters): "
+labels: ["adapter wanted"]
+assignees: ["JoeyHammoth"]
+body:
+  - type: input
+    id: source
+    attributes:
+      label: Source name
+      placeholder: Internet Archive, Spotify, Hacker News…
+    validations:
+      required: true
+
+  - type: input
+    id: docs
+    attributes:
+      label: API documentation URL
+    validations:
+      required: true
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Who should build it?
+      options:
+        - Community adapter (you or someone else, listed in the registry)
+        - First-party adapter (maintainers)
+    validations:
+      required: true
+
+  - type: textarea
+    id: fields
+    attributes:
+      label: What maps to a Card?
+      description: Which fields become title, subtitle, body, tags, media, facts, url?
+    validations:
+      required: true
+
+  - type: textarea
+    id: terms
+    attributes:
+      label: Terms, rate limits and attribution
+      description: Link the terms and note any attribution requirement, rate limit or caching restriction. Adapters do not bypass terms.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: auth
+    attributes:
+      label: Authentication
+      options:
+        - None (public API)
+        - API key required
+        - OAuth required
+        - User-owned export or file
+    validations:
+      required: true

@@ -1,0 +1,38 @@
+name: Stale
+
+on:
+  schedule:
+    - cron: "41 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v11
+        with:
+          days-before-issue-stale: 120
+          days-before-issue-close: 30
+          days-before-pr-stale: 90
+          days-before-pr-close: 30
+          stale-issue-label: "needs-info"
+          exempt-issue-labels: "good first issue,help wanted,adapter wanted,epic,security,needs-rfc,design"
+          exempt-pr-labels: "security,release,breaking"
+          stale-issue-message: >
+            This issue has not had activity for four months. It will close in 30
+            days unless there is new information — a comment is enough to keep it
+            open.
+          close-issue-message: >
+            Closing for now. Reopen any time with the details requested above; a
+            closed issue is not a rejection.
+          stale-pr-message: >
+            This pull request has been quiet for three months. It will close in 30
+            days unless it is updated or explicitly kept open.
+          close-pr-message: >
+            Closing to keep the queue honest. Reopen when you can continue; the
+            branch and commits are still yours.

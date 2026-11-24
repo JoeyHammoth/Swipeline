@@ -1,0 +1,58 @@
+name: Feature request
+description: Propose a capability, a stage, a binding or an improvement.
+title: "feat: "
+labels: ["enhancement"]
+assignees: ["JoeyHammoth"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Swipeline deliberately stays small. The strongest proposals name the
+        extension point they use, or explain why a new one is needed.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: Who is stuck, and on what? Concrete use cases beat abstractions.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: The smallest version that solves it. Include the config or interface shape if you have one.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: layer
+    attributes:
+      label: Which layer?
+      options:
+        - core (schemas, engine, stores)
+        - ranking
+        - adapters
+        - a UI binding
+        - server / sync
+        - cli / scaffolding
+        - docs / tooling
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Including "use an existing extension point" and "do nothing".
+
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope check
+      options:
+        - label: This is not a two-sided matching product, a hosted SaaS, a scraping tool or an analytics platform.
+          required: true
+        - label: This does not require changing a published schema or interface without an RFC.
+          required: false

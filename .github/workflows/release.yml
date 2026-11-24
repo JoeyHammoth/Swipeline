@@ -1,0 +1,56 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    # Update this guard when the repository moves to the swipeline organisation.
+    if: github.repository == 'JoeyHammoth/Swipeline'
+    runs-on: ubuntu-latest
+    environment: npm-publish
+    permissions:
+      contents: write # push version commits and tags
+      pull-requests: write # open the Version Packages PR
+      id-token: write # OIDC for npm trusted publishing and provenance
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      # Trusted publishing requires npm >= 11.5.1; Node 24 ships a newer one, but
+      # we pin the intent so a future base image change does not silently break it.
+      - name: Ensure a trusted-publishing-capable npm
+        run: npm install --global npm@latest && npm --version
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Create release PR or publish
+        uses: changesets/action@v2
+        with:
+          version: pnpm changeset version
+          publish: pnpm release
+          title: "chore: version packages"
+          commit: "chore: version packages"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_CONFIG_PROVENANCE: "true"
