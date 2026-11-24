@@ -130,7 +130,11 @@ Gorse and similar engines are a complement, not a competitor: an `external` rank
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md). We use the Developer Certificate of Origin — sign off your commits with `git commit -s`. Security reports go through [SECURITY.md](SECURITY.md), never a public issue. Governance, including how to become a maintainer, is in [GOVERNANCE.md](GOVERNANCE.md).
 
-Good first contributions: a new source adapter, a card template, documentation fixes, or a binding for your favourite framework.
+Looking for a first contribution? Browse [`good first issue`](https://github.com/JoeyHammoth/Swipeline/issues?q=is%3Aopen+label%3A%22good+first+issue%22), or start with a new source adapter, a card template, documentation fixes, or a binding for your favourite framework.
+
+## Support
+
+Questions and design discussions belong in [GitHub Discussions](https://github.com/JoeyHammoth/Swipeline/discussions). Reproducible bugs go to [GitHub Issues](https://github.com/JoeyHammoth/Swipeline/issues). Report security problems privately through [SECURITY.md](SECURITY.md).
 
 ## License
 

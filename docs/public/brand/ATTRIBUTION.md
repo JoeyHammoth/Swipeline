@@ -4,6 +4,8 @@
 |---|---|---|
 | `logo.svg` | Authored for Swipeline | Apache-2.0 (same as the project) |
 | `hero.svg` | Authored for Swipeline | Apache-2.0 (same as the project) |
+| `social-preview.svg` | Authored for Swipeline | Apache-2.0 (same as the project) |
+| `social-preview.png` | Rendered from `social-preview.svg` | Apache-2.0 (same as the project) |
 | `hero-phone.png` | [Icons8 Ouch](https://icons8.com/illustrations) — "Mobile phone with blue wallpaper and apps icons" (Fogg style) | Icons8 free license, permitted for use in this documentation |
 | `icon-hand-drag.png` | [Icons8](https://icons8.com/icons/set/hand-drag) — "Hand Drag" icon | Icons8 free license, permitted for use in this documentation |
 

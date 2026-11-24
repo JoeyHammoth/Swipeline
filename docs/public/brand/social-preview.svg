@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-labelledby="title desc">
+  <title id="title">Swipeline</title>
+  <desc id="desc">From any source to a ranked deck. A local-first TypeScript toolkit for swipeable recommendation decks.</desc>
+
+  <defs>
+    <linearGradient id="card" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7a6bff"/>
+      <stop offset="1" stop-color="#25c2a0"/>
+    </linearGradient>
+    <linearGradient id="flow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#3a3b58"/>
+      <stop offset="1" stop-color="#25c2a0"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="78%" cy="42%" r="55%">
+      <stop offset="0" stop-color="#6d5efc" stop-opacity="0.34"/>
+      <stop offset="0.55" stop-color="#25c2a0" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#0f1020" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="12" stdDeviation="18" flood-color="#05060f" flood-opacity="0.65"/>
+    </filter>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0v48" fill="none" stroke="#3a3b58" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1280" height="640" fill="#0f1020"/>
+  <rect width="1280" height="640" fill="url(#grid)" opacity="0.18"/>
+  <rect width="1280" height="640" fill="url(#glow)"/>
+
+  <!-- Logo mark -->
+  <g transform="translate(72 64) scale(1.5)">
+    <rect width="64" height="64" rx="14" fill="#17182b"/>
+    <g transform="rotate(-10 32 32)">
+      <rect x="12" y="18" width="27" height="36" rx="5" fill="#2a2b45" stroke="#6d5efc" stroke-width="2"/>
+    </g>
+    <g transform="rotate(6 32 32)">
+      <rect x="24" y="13" width="27" height="36" rx="5" fill="url(#card)"/>
+      <path d="M31 27h13M31 33h9" stroke="#0f1020" stroke-width="2.5" stroke-linecap="round"/>
+    </g>
+    <path d="M47 44l7 0m-3-3l3 3-3 3" stroke="#25c2a0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+
+  <text x="72" y="258" fill="#f5f5ff" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="86" font-weight="700" letter-spacing="-2">Swipeline</text>
+  <text x="74" y="322" fill="#f5f5ff" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="33" font-weight="500">From any source to a ranked deck.</text>
+  <text x="74" y="374" fill="#b8bad4" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="24">A local-first TypeScript toolkit for building</text>
+  <text x="74" y="406" fill="#b8bad4" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="24">swipeable recommendation decks.</text>
+
+  <g font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="600">
+    <rect x="74" y="454" width="120" height="40" rx="20" fill="#1c1d31" stroke="#3d3f63"/>
+    <text x="134" y="479" fill="#c9cbe4" text-anchor="middle">TypeScript</text>
+    <rect x="204" y="454" width="118" height="40" rx="20" fill="#1c1d31" stroke="#3d3f63"/>
+    <text x="263" y="479" fill="#c9cbe4" text-anchor="middle">local-first</text>
+    <rect x="332" y="454" width="104" height="40" rx="20" fill="#1c1d31" stroke="#3d3f63"/>
+    <text x="384" y="479" fill="#c9cbe4" text-anchor="middle">modular</text>
+  </g>
+
+  <text x="74" y="582" fill="#8f91b0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19">github.com/JoeyHammoth/Swipeline</text>
+  <circle cx="491" cy="575" r="5" fill="#25c2a0"/>
+  <text x="506" y="582" fill="#8f91b0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19">Open source · Apache-2.0</text>
+
+  <!-- Source rows -->
+  <g fill="#1c1d31" stroke="#33355a">
+    <rect x="690" y="152" width="154" height="16" rx="8"/>
+    <rect x="690" y="184" width="118" height="16" rx="8"/>
+    <rect x="690" y="216" width="138" height="16" rx="8"/>
+  </g>
+  <text x="690" y="264" fill="#8f91b0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15">any source</text>
+
+  <!-- Pipeline -->
+  <path d="M854 198h76" stroke="url(#flow)" stroke-width="3" stroke-linecap="round"/>
+  <path d="M922 192l10 6-10 6" fill="none" stroke="#25c2a0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <g fill="#16172a" stroke="#3d3f63">
+    <rect x="856" y="154" width="94" height="24" rx="12"/>
+    <rect x="856" y="186" width="94" height="24" rx="12"/>
+    <rect x="856" y="218" width="94" height="24" rx="12"/>
+  </g>
+  <g fill="#8f91b0" font-family="SFMono-Regular, Consolas, monospace" font-size="10">
+    <text x="868" y="170">seenFilter</text>
+    <text x="868" y="202">tagAffinity</text>
+    <text x="868" y="234">prefVector</text>
+  </g>
+
+  <g transform="translate(24 0)">
+    <!-- Card stack -->
+    <g filter="url(#shadow)">
+      <g transform="rotate(-9 1042 318)">
+        <rect x="938" y="160" width="216" height="310" rx="22" fill="#1b1c30" stroke="#3a3b58"/>
+      </g>
+      <g transform="rotate(4 1042 318)">
+        <rect x="932" y="146" width="216" height="310" rx="22" fill="#1b1c30" stroke="#3a3b58"/>
+      </g>
+      <g transform="rotate(-2 1042 318)">
+        <rect x="926" y="132" width="216" height="310" rx="22" fill="url(#card)"/>
+        <rect x="954" y="160" width="160" height="118" rx="12" fill="#0f1020" opacity="0.28"/>
+        <rect x="954" y="300" width="118" height="14" rx="7" fill="#0f1020" opacity="0.45"/>
+        <rect x="954" y="326" width="84" height="12" rx="6" fill="#0f1020" opacity="0.32"/>
+        <g fill="#0f1020" opacity="0.55">
+          <rect x="954" y="362" width="44" height="18" rx="9"/>
+          <rect x="1006" y="362" width="58" height="18" rx="9"/>
+        </g>
+      </g>
+    </g>
+
+    <!-- Swipe actions -->
+    <g>
+      <circle cx="958" cy="510" r="19" fill="#1c1d31" stroke="#5a5c86"/>
+      <path d="M950 502l14 14M964 502l-14 14" stroke="#ff7a90" stroke-width="2.8" stroke-linecap="round"/>
+      <circle cx="1014" cy="510" r="19" fill="#1c1d31" stroke="#5a5c86"/>
+      <path d="M1023 510a9 9 0 1 0-3 7" fill="none" stroke="#9ea0c0" stroke-width="2.8" stroke-linecap="round"/>
+      <circle cx="1070" cy="510" r="19" fill="#1c1d31" stroke="#5a5c86"/>
+      <path d="M1070 499l4 8 9 1-7 6 2 9-8-4-8 4 2-9-7-6 9-1z" fill="#ffd166"/>
+      <circle cx="1126" cy="510" r="19" fill="#1c1d31" stroke="#5a5c86"/>
+      <path d="M1126 519s-10-6-10-13a5 5 0 0 1 10-1 5 5 0 0 1 10 1c0 7-10 13-10 13z" fill="#25c2a0"/>
+    </g>
+  </g>
+</svg>

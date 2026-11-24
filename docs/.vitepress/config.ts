@@ -1,9 +1,10 @@
 import { defineConfig } from 'vitepress'
 
 // Project Pages URL until the organisation transfer: https://joeyhammoth.github.io/Swipeline/
-// `base` must keep that trailing slash or every asset 404s. Update both base and
-// sitemap hostname together when moving to a custom domain or org-level Pages.
+// `base` must keep that trailing slash or every asset 404s. Update SITE_URL, base
+// and the sitemap hostname together when moving to a custom domain or org-level Pages.
 const BASE = '/Swipeline/'
+const SITE_URL = 'https://joeyhammoth.github.io/Swipeline/'
 
 export default defineConfig({
   lang: 'en-US',
@@ -17,7 +18,13 @@ export default defineConfig({
     ['link', { rel: 'icon', type: 'image/svg+xml', href: `${BASE}brand/logo.svg` }],
     ['meta', { name: 'theme-color', content: '#0f1020' }],
     ['meta', { property: 'og:type', content: 'website' }],
-    ['meta', { property: 'og:image', content: `${BASE}brand/hero.svg` }],
+    ['meta', { property: 'og:image', content: `${SITE_URL}brand/social-preview.png` }],
+    ['meta', { property: 'og:image:type', content: 'image/png' }],
+    ['meta', { property: 'og:image:width', content: '1280' }],
+    ['meta', { property: 'og:image:height', content: '640' }],
+    ['meta', { property: 'og:image:alt', content: 'Swipeline — from any source to a ranked deck' }],
+    ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
+    ['meta', { name: 'twitter:image', content: `${SITE_URL}brand/social-preview.png` }],
   ],
 
   themeConfig: {
@@ -139,5 +146,5 @@ export default defineConfig({
     },
   },
 
-  sitemap: { hostname: 'https://joeyhammoth.github.io/Swipeline/' },
+  sitemap: { hostname: SITE_URL },
 })
