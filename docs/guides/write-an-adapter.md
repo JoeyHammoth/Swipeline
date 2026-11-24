@@ -4,15 +4,11 @@ An adapter turns one source into [`Card`s](/concepts/cards-and-adapters). It is 
 most useful contribution to the project and usually a day's work, most of it
 reading the source's terms.
 
-## Start from the template
+## Start manually
 
-```bash
-npm create swipeline-adapter@latest my-source
-```
-
-You get `src/index.ts`, fixtures, a conformance test and a README with the terms
-checklist. When the template package lands (M2), the manual path below is the same
-shape.
+There is no published adapter generator yet. The manual path below is the
+supported way to create an adapter; a generator is planned for the
+`create-swipeline` package in M3.
 
 ## Implement `SourceAdapter`
 
@@ -119,8 +115,8 @@ describe('my-source adapter', () => {
 })
 ```
 
-`@swipeline/adapter-testkit` (M2) adds the shared conformance assertions:
-pagination termination, attribution presence when `required`, and schema validity
+The workspace package `@swipeline/adapter-testkit` provides shared conformance
+assertions for pagination termination, required attribution and schema validity
 for every fixture row.
 
 ## Publish and register
