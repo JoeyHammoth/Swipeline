@@ -65,7 +65,7 @@ export function actionButtons(
   return directions.map((direction) => {
     const action = options.actions?.[direction] ?? DEFAULT_DIRECTION_ACTIONS[direction]
     const shortcut =
-      Object.keys(keymap).find((key) => keymap[key] === direction) ?? 'Arrow' + direction
+      Object.keys(keymap).find((key) => keymap[key] === direction) ?? `Arrow${direction}`
     const label = ACTION_LABELS[action] ?? action
     return {
       direction,

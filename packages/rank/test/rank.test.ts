@@ -43,6 +43,13 @@ function profile(tagStats: Profile['tagStats'], prefVector?: number[]): Profile 
   return base
 }
 
+function setScores(ctx: RankContext, scores: readonly number[]): void {
+  for (const [index, score] of scores.entries()) {
+    const candidate = ctx.candidates[index]
+    if (candidate) candidate.score = score
+  }
+}
+
 function context(candidates: Card[], overrides: Partial<RankContext> = {}): RankContext {
   return {
     actor: 'actor-1',
@@ -105,8 +112,7 @@ describe('basic stages', () => {
 
   it('limits and explains the final list', async () => {
     const ctx = context([card(1, []), card(2, []), card(3, [])], { limit: 2 })
-    ctx.candidates[0]!.score = 0.1
-    ctx.candidates[1]!.score = 0.9
+    setScores(ctx, [0.1, 0.9])
     const result = await explain().run(ctx)
     expect(result.candidates).toHaveLength(2)
     expect(result.candidates[0]?.card.id).toBe('demo:2')
@@ -115,9 +121,7 @@ describe('basic stages', () => {
 
   it('mmr prefers a diverse second card over a near-duplicate', async () => {
     const ctx = context([card(1, ['space']), card(2, ['space']), card(3, ['crime'])], { limit: 2 })
-    ctx.candidates[0]!.score = 1
-    ctx.candidates[1]!.score = 0.99
-    ctx.candidates[2]!.score = 0.9
+    setScores(ctx, [1, 0.99, 0.9])
     const result = await mmr(0.5).run(ctx)
     expect(result.candidates.map((candidate) => candidate.card.id)).toEqual(['demo:1', 'demo:3'])
   })
