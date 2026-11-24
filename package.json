@@ -23,6 +23,7 @@
     "attw": "pnpm -r --filter \"./packages/**\" exec attw --pack . --exclude-entrypoints ./styles.css",
     "check:boundaries": "node scripts/check-boundaries.mjs",
     "licenses:check": "node scripts/check-licenses.mjs",
+    "package:licenses": "node scripts/check-package-licenses.mjs",
     "schemas:export": "pnpm --filter @swipeline/core run schemas:export",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",

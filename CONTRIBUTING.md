@@ -46,6 +46,7 @@ Useful scripts:
 | `pnpm publint` | Validate `exports`, types and dual-format builds |
 | `pnpm check:boundaries` | Fail on framework dependencies outside bindings |
 | `pnpm licenses:check` | Dependency license policy |
+| `pnpm package:licenses` | Published packages carry `LICENSE` and `NOTICE` |
 | `pnpm docs:dev` / `pnpm docs:build` | VitePress site |
 | `pnpm changeset` | Record a user-facing change |
 
@@ -113,6 +114,12 @@ Conventional Commits style: `feat:`, `fix:`, `docs:`, `test:`, `chore:`,
    with deterministic RNG where ranking is involved.
 5. **Licenses.** Permissive dependencies only; no GPL/AGPL/SSPL/BUSL and no
    "commercial license for production" packages.
+
+   npm packs a tarball from the package directory, so every public package
+   carries a copy of the root `LICENSE` and `NOTICE` and lists both in `files`.
+   The root files stay the source of truth: after either changes, run
+   `node scripts/sync-package-licenses.mjs`, and `pnpm package:licenses` fails CI
+   when a copy drifts or a tarball would not include it.
 
 ## Governance and becoming a maintainer
 

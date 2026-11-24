@@ -65,6 +65,9 @@ jobs:
       - name: Dependency license policy
         run: pnpm licenses:check
 
+      - name: Published packages carry LICENSE and NOTICE
+        run: pnpm package:licenses
+
       # The repository dependency graph does not resolve yet, so GitHub's
       # dependency-review action returns 403 (tracked in issue #27). This audit is
       # the working vulnerability gate until that is fixed.
