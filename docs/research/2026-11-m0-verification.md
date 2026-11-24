@@ -135,3 +135,34 @@ closed, the plan's own rule is not satisfied and the docs say so.
 | First publish per package | Trusted publishers can only be configured for an existing package | M3 release task |
 | Real `CODEOWNERS` handles | Only one maintainer today; placeholder team handles will fail validation | M0 uses the owner account |
 | Social preview image | GitHub has no API for it; must be uploaded in the UI | Documented in the repo metadata issue |
+
+## 7. Settings applied on 2026-11-24 (verified outcomes)
+
+The table in §4 records what was observed *before* any changes. This section records
+what actually happened, because two items behaved differently from the plan.
+
+| Setting | Outcome |
+|---|---|
+| Repository description and topics | Applied (12 topics: swipe, recommendation, typescript, local-first, …) |
+| Homepage | Set to the Pages URL |
+| Discussions | Enabled |
+| Dependabot alerts and security updates | Enabled (alerts endpoint returned 204, status now `enabled`) |
+| CodeQL | Workflow runs on PRs, `main` and weekly; first analysis passed |
+| Secret scanning, push protection | Already enabled, unchanged |
+| Secret scanning **non-provider patterns** and **validity checks** | **Still disabled.** The repository PATCH accepted the request but the states did not change; these are not settable through the REST API for this repository |
+| Pages | Enabled with `build_type: workflow`; the first deploy ran before Pages existed and failed at `configure-pages`, so the workflow was re-run after enabling |
+| Rulesets | `main`: PR + 1 approval + CODEOWNERS + conversation resolution + required checks (Node 24, Node 26, DCO, Docs build) + linear history + no force push/deletion, admin bypass. Tags `refs/tags/v*`: deletion and force-update blocked |
+| Environments | `npm-publish` (required reviewer, `main` only), `github-pages` (`main` only) |
+| Merge settings | Squash only, delete branch on merge, PR title as commit subject |
+| Default workflow permissions | Read-only, cannot approve PRs |
+
+### Two deviations worth remembering
+
+1. **GitHub dependency review is unavailable.** The dependency-graph compare API
+   returns 403 and `/dependency-graph/sbom` returns 404 even though the default
+   branch has a committed `pnpm-lock.yaml`. The PR gate is
+   `pnpm audit --prod --audit-level=high` plus the license policy; the
+   dependency-review workflow is manual-only until the graph resolves (issue #27).
+2. **Secret-scanning extras are not API-settable** on this repository. They remain
+   disabled and must be enabled in Settings → Code security if the plan's checklist
+   is to be complete.
