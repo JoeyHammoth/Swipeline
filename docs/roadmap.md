@@ -16,19 +16,20 @@ work starts.
 - [x] Core `Card`, `SwipeEvent` and `Profile` schemas with tests
 - [x] CI, docs deploy, CodeQL, dependency review, Scorecard, Dependabot
 - [x] Docs site skeleton deployed to GitHub Pages
-- [ ] RFC-0001 (Card and SwipeEvent schemas) accepted
-- [ ] SHA-pinned GitHub Actions
+- [x] RFC-0001 (Card and SwipeEvent schemas) accepted
+- [x] SHA-pinned GitHub Actions
 - [ ] Repository transferred to the `swipeline` organisation (before first publish)
 
-## M1 — v0.1: core, gestures, React
+## M1 — v0.1: core, gestures, React (in progress)
 
-- `core`: deck engine implementing `DeckStore`, outbox, undo stack
-- `gestures`: vanilla pointer/keyboard controller with `computeSwipeIntent`
-- `store-memory`, `store-indexeddb`
-- `adapters`: `http-json`
-- `rank`: `seenFilter`, `tagAffinity`, hashed-feature `prefVector`, `epsilonRandom`, `mmr`
-- `react`: `SwipeDeck` with buttons, keyboard path and reduced motion
-- Examples: books and recipes; quickstart docs; playground v0
+- [x] `core`: deck engine implementing `DeckStore`, outbox, undo stack
+- [x] `gestures`: vanilla pointer/keyboard controller with `computeSwipeIntent`
+- [x] `store-memory`, `store-indexeddb` against one conformance suite
+- [x] `adapters`: `http-json` with an adapter testkit
+- [x] `rank`: the default pipeline plus `@swipeline/bench`
+- [x] `react`: `SwipeDeck` with buttons, keyboard path and reduced motion
+- [x] Playground v0
+- [ ] Examples: books and recipes; quickstart docs
 - Acceptance: quickstart under 10 minutes on a clean machine, a11y checks pass,
   `check:boundaries` green
 

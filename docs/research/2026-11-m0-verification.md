@@ -166,3 +166,18 @@ what actually happened, because two items behaved differently from the plan.
 2. **Secret-scanning extras are not API-settable** on this repository. They remain
    disabled and must be enabled in Settings → Code security if the plan's checklist
    is to be complete.
+
+## Name similarity checks (2026-11-24)
+
+Recorded before the organisation transfer. These checks cover *similar*
+names, not just exact matches; trademark and domain registration still
+require accounts or payment and remain open in #18.
+
+- npm search for `swipeline`: no results returned (checked 2026-11-24)
+- PyPI exact name `swipeline`: HTTP 404 (404 means the name is free)
+- pub.dev search for `swipeline`: pipeliner, smf_pipeline, gpu_pipeline, flutter_pipeline, otel_bitbucket_pipelines, leulit_pipeline_pattern, pipeline_plus, aws_codepipeline_api, mediapipeline_flutter, image_pipeline
+- GitHub organisation `swipeline`: not found or not visible to this token
+
+Still outstanding: trademark search in the software classes, registering
+`swipeline.dev` and `swipeline.io`, reserving social handles, and a
+pronunciation/spelling check with developers.
