@@ -42,17 +42,36 @@ export const adapter: SourceAdapter<Row> = {
     if (query) url.searchParams.set('q', query)
     if (typeof filters?.category === 'string') url.searchParams.set('category', filters.category)
 
-    const response = await globalThis.fetch(url, {
-      signal,
-      headers: { accept: 'application/json' },
-    })
+    let response: Response | undefined
 
-    if (response.status === 429) {
-      const retryAfter = Number(response.headers.get('retry-after') ?? '1')
-      await new Promise((resolve) => setTimeout(resolve, retryAfter * 1000))
-      // One retry only; let the engine back off after that.
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      if (signal?.aborted) throw new Error('my-source: request aborted')
+
+      response = await globalThis.fetch(url, {
+        signal,
+        headers: { accept: 'application/json' },
+      })
+
+      const shouldRetry = response.status === 429 || response.status >= 500
+      if (response.ok || !shouldRetry || attempt === 1) break
+
+      if (signal?.aborted) throw new Error('my-source: request aborted')
+
+      const retryAfter = response.headers.get('retry-after')
+      const retryAfterSeconds = retryAfter ? Number(retryAfter) : Number.NaN
+      const retryAfterDate = retryAfter ? Date.parse(retryAfter) : Number.NaN
+      const delayMs = Number.isFinite(retryAfterSeconds)
+        ? Math.max(0, retryAfterSeconds * 1000)
+        : Number.isFinite(retryAfterDate)
+          ? Math.max(0, retryAfterDate - Date.now())
+          : 250
+
+      await new Promise((resolve) => setTimeout(resolve, delayMs))
     }
-    if (!response.ok) throw new Error(`my-source: HTTP ${response.status}`)
+
+    if (!response?.ok) {
+      throw new Error(`my-source: HTTP ${response?.status ?? 'unknown'}`)
+    }
 
     const body = (await response.json()) as { items: Row[]; next?: string | null }
     return {
