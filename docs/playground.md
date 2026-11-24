@@ -1,72 +1,52 @@
 # Playground
 
-An in-browser deck you can try without installing anything: pick a source, tune
-the ranking pipeline with sliders, and watch the cards change as you swipe.
+An in-browser deck you can try without installing anything. Pick a bundled source,
+adjust how much your swipes steer the order, and watch the deck re-rank as you go.
 
-::: warning Milestone M1 (v0 live), M2 (full)
-The playground is not built yet. This page describes the contract it must meet,
-including the security constraint that shapes it.
-:::
+<Playground />
 
-## What it does
+## What v0 does
 
-```text
-┌─ Swipeline Playground ──────────────────────────────────────────────────┐
-│ Source: [Open Library ▾]   Query: [science fiction]   [Load]            │
-├───────────────────────────────┬─────────────────────────────────────────┤
-│        ┌───────────┐          │ Ranker pipeline                         │
-│        │   CARD    │          │  1 seenFilter                           │
-│        └───────────┘          │  2 tagAffinity   weight [0.4]  ───●──   │
-│       (✕) (↶) (★) (♥)         │  3 prefVector    weight [0.6]  ────●─   │
-│                               │  4 mmr           lambda [0.75]  ───●──  │
-│ Swipes: 23  Likes: 9          │ Why this card?                          │
-│                               │  + similar to 3 liked items             │
-│ Your taste (live):            │  + tag "space opera" affinity 0.72      │
-│  ████ space opera             │  ~ exploration boost 0.08               │
-├───────────────────────────────┴─────────────────────────────────────────┤
-│ [Export manifest]  [Copy share link]  [Export history (JSONL)]          │
-└─────────────────────────────────────────────────────────────────────────┘
-```
+- Runs entirely in the browser against bundled fixtures: no network, no account,
+  no upload.
+- Derives tag affinities from your swipes with the same action weights as the
+  engine defaults (`superlike` 2, `like` 1, `later` 0.5, `dislike` -0.6).
+- Re-ranks the remaining cards by tag affinity, blended by the weight slider.
+- Shows a per-card "why this card" line and the live taste bars.
+- Encodes the manifest in the URL hash, and exports the manifest plus a JSONL
+  history of the session.
 
-- Runs entirely in the browser: memory store, no account, no upload.
-- Shows the live profile (tag affinities) and the per-card reasons.
-- Exports a manifest, which is also the share link payload.
+## What v0 does not do yet
+
+- It does not call Open Library or arXiv. Live sources arrive with the HTTP
+  adapter in M2, and only CORS-friendly, terms-permitting sources will be offered.
+- It does not run `prefVector`, `thompson`, `epsilonRandom` or `mmr`. Those stages
+  ship with `@swipeline/rank` in M2; the panel lists only what actually runs.
+- Nothing is persisted. Reloading clears the session unless you exported it.
 
 ## Share links are data, never code
 
-A share link encodes the manifest in the URL hash:
-
 ```text
-#manifest=eyJpZCI6ImJvb2tzIiwic291cmNlIjp7InR5cGUiOiJodHRwLWpzb24iLC...
+#manifest=eyJhY3Rpb25zIjp7ImRvd24iOiJsYXRlciIsImxlZnQiOiJkaXNsaWtlIiwi...
 ```
 
-Constraints, all of them enforced:
+The hash is a base64url-encoded JSON manifest. Before it is applied it is
+validated against a closed shape:
 
-1. The manifest contains no executable code; unknown stages or fields are refused.
-2. The playground never evaluates fetched strings.
-3. A strict Content-Security-Policy allows only the playground bundle and the
-   CORS-friendly sources listed below.
-4. The playground never sends manifests or events to a Swipeline service — there
-   is none.
+1. Exactly the known keys (`schemaVersion`, `id`, `dataset`, `actions`,
+   `pipeline`, `tagWeight`). Anything else is refused.
+2. `dataset` must be one of the bundled fixtures, `pipeline` may only name stages
+   this page implements, and `tagWeight` must be between 0 and 1.
+3. `actions` must map all four directions to a known action.
+4. The payload is parsed as JSON and never evaluated; a bad link falls back to
+   the default deck with a visible message.
 
-## Sources it can load
-
-Only CORS-enabled, terms-permitting sources are offered: Open Library, arXiv, and
-a bundled fixture set for offline demos. Anything that needs a key or forbids
-browser requests is not selectable; the playground is not a way around an API's
-terms.
-
-## Why it exists
-
-Three reasons, in order:
-
-1. **Evaluation:** people can judge the ranking story in thirty seconds instead of
-   cloning a repo.
-2. **Debugging:** "why this card" makes ranking behaviour concrete.
-3. **Sharing:** a manifest in a link is a reproducible bug report or demo.
+The page makes no requests, so a manifest cannot point it at a third-party
+endpoint.
 
 ## Accessibility
 
-The playground uses the same `<swipe-deck>` element as everyone else, so it
-inherits the buttons, keyboard map and reduced-motion behaviour. axe runs against
-it in CI along with the demos.
+Every action has a button and a keyboard shortcut (← → ↑ ↓, `U` to undo), changes
+are announced in a polite live region, focus stays on the controls you pressed,
+and the layout honours `prefers-reduced-motion`. The playground reuses the same
+action weights and keyboard map the bindings must implement.

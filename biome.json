@@ -14,7 +14,8 @@
       "!docs/.vitepress/cache",
       "!docs/public",
       "!**/*.md",
-      "!pnpm-lock.yaml"
+      "!pnpm-lock.yaml",
+      "!**/*.vue"
     ]
   },
   "formatter": {
