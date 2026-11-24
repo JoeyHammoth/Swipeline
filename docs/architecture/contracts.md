@@ -1,8 +1,19 @@
 # Contracts
 
-**Status:** M0. These signatures are what M1 implements. `Card`, `SwipeEvent` and
-`Profile` are already implemented as Zod schemas in `packages/core`; the rest are
-proposals that RFC-0001 freezes. Behaviour described here is normative.
+**Status:** M1. `Card`, `SwipeEvent`, `Profile`, `SourceAdapter`, the store
+interfaces and the `DeckStore` engine are implemented in `packages/core`.
+`RankStage`, `Embedder`, `VectorIndex`, `Sink` delivery guarantees and the
+server contracts are implemented in their own packages through M2/M3; this file
+remains the normative description. Behaviour described here is normative.
+
+Implementation notes for the M1 engine: `createEngine` additionally returns
+`whenSettled()` (awaits every queued effect, for tests and SSR) and `close()`
+(aborts in-flight fetches and drops listeners). The `setOffline` command was
+added to the union so a host can reflect connectivity without a fetch failure.
+Prefetch defaults are 8/3, undo depth 5, and the default event log is in-memory;
+`@swipeline/store-*` replaces it behind the same `EventStore` interface.
+Outbox syncing, ranking stages, embedders and vector indexes are not part of this
+milestone (`#9`, `#10`).
 
 Every contract in this file is a **seam**: a place where an implementation can be
 swapped. The rule from the plan applies — one adapter is a hypothetical seam, two
