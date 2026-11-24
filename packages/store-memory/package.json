@@ -74,5 +74,12 @@
     "vitest": {
       "optional": true
     }
+  },
+  "typesVersions": {
+    "*": {
+      "conformance": [
+        "./dist/conformance.d.ts"
+      ]
+    }
   }
 }
