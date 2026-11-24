@@ -95,6 +95,7 @@ export default defineConfig({
           { text: 'Benchmarks', link: '/benchmarks' },
           { text: 'Landscape', link: '/landscape' },
           { text: 'Roadmap', link: '/roadmap' },
+          { text: 'Organisation transfer', link: '/operations/org-transfer' },
           { text: 'Changelog', link: '/changelog' },
         ],
       },
