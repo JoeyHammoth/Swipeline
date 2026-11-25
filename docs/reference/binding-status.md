@@ -35,3 +35,5 @@ table gains a browser column rather than changing its meaning.
 
 See [Write a UI binding](/guides/write-a-binding) for the eight behaviours every
 binding needs and the packaging rules.
+
+<!-- gate smoke test: dependency review runs on pull requests again (issue #27) -->
