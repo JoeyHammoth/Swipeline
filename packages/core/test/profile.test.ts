@@ -154,6 +154,111 @@ describe('rebuildProfile', () => {
     })
     expect(Object.isFrozen(DEFAULT_ACTION_WEIGHTS)).toBe(true)
   })
+
+  it('falls back to context.tags when tagsByCardId is omitted', () => {
+    const profile = rebuildProfile([event(0, 'like', 'src:0', ['Space Opera'])], {
+      actor: 'a',
+      deckId: 'd',
+      now: NOW,
+    })
+    expect(profile.tagStats).toEqual({ 'space opera': { a: 1, b: 0 } })
+  })
+
+  it('falls back to context.tags when tagsByCardId is missing the card key', () => {
+    const ev = event(0, 'like', 'evicted:1', ['Space Opera'])
+    const fromMap = rebuildProfile([ev], {
+      actor: 'a',
+      deckId: 'd',
+      tagsByCardId: new Map([['other:1', ['Mystery']]]),
+      now: NOW,
+    })
+    const fromRecord = rebuildProfile([ev], {
+      actor: 'a',
+      deckId: 'd',
+      tagsByCardId: { 'other:1': ['Mystery'] },
+      now: NOW,
+    })
+    expect(fromMap.tagStats).toEqual({ 'space opera': { a: 1, b: 0 } })
+    expect(fromRecord.tagStats).toEqual({ 'space opera': { a: 1, b: 0 } })
+  })
+
+  it('prefers tagsByCardId over context.tags, including explicit empty arrays', () => {
+    const ev = event(0, 'like', 'src:0', ['Space Opera'])
+    const mapNonEmpty = rebuildProfile([ev], {
+      actor: 'a',
+      deckId: 'd',
+      tagsByCardId: new Map([['src:0', ['Mystery']]]),
+      now: NOW,
+    })
+    const recordNonEmpty = rebuildProfile([ev], {
+      actor: 'a',
+      deckId: 'd',
+      tagsByCardId: { 'src:0': ['Mystery'] },
+      now: NOW,
+    })
+    const mapEmpty = rebuildProfile([ev], {
+      actor: 'a',
+      deckId: 'd',
+      tagsByCardId: new Map([['src:0', []]]),
+      now: NOW,
+    })
+    const recordEmpty = rebuildProfile([ev], {
+      actor: 'a',
+      deckId: 'd',
+      tagsByCardId: { 'src:0': [] },
+      now: NOW,
+    })
+
+    expect(mapNonEmpty.tagStats).toEqual({ mystery: { a: 1, b: 0 } })
+    expect(recordNonEmpty.tagStats).toEqual({ mystery: { a: 1, b: 0 } })
+    expect(mapEmpty.tagStats).toEqual({})
+    expect(recordEmpty.tagStats).toEqual({})
+  })
+
+  it('ignores malformed context.tags without throwing while keeping valid tags', () => {
+    const base = event(0, 'like', 'src:0', [])
+    const nonArrayEvents: SwipeEvent[] = [
+      { ...base, id: '01JC0B5V6Q9F3ZK2M4N7P8RSTA', context: { tags: 'not-an-array' } },
+      { ...base, id: '01JC0B5V6Q9F3ZK2M4N7P8RSTB', context: { tags: 42 } },
+      { ...base, id: '01JC0B5V6Q9F3ZK2M4N7P8RSTC', context: { tags: null } },
+    ]
+    const nonArrayProfile = rebuildProfile(nonArrayEvents, {
+      actor: 'a',
+      deckId: 'd',
+      now: NOW,
+    })
+    expect(nonArrayProfile.tagStats).toEqual({})
+
+    const mixedEvent: SwipeEvent = {
+      ...base,
+      context: { tags: ['Valid', 123, null, { name: 'obj' }, '   ', ''] },
+    }
+    const mixedProfile = rebuildProfile([mixedEvent], {
+      actor: 'a',
+      deckId: 'd',
+      now: NOW,
+    })
+    expect(mixedProfile.tagStats).toEqual({ valid: { a: 1, b: 0 } })
+  })
+
+  it('accumulates prototype-key tag names such as constructor safely', () => {
+    const profile = rebuildProfile([event(0, 'like', 'src:0', ['Constructor'])], {
+      actor: 'a',
+      deckId: 'd',
+      now: NOW,
+    })
+    expect(profile.tagStats.constructor).toEqual({ a: 1, b: 0 })
+  })
+
+  it('skips __proto__ tags without mutating tagStats prototype while counting valid tags', () => {
+    const profile = rebuildProfile([event(0, 'like', 'src:0', ['__proto__', 'Space Opera'])], {
+      actor: 'a',
+      deckId: 'd',
+      now: NOW,
+    })
+    expect(Object.getPrototypeOf(profile.tagStats)).toBe(Object.prototype)
+    expect(profile.tagStats).toEqual({ 'space opera': { a: 1, b: 0 } })
+  })
 })
 
 describe('profile invariants (property-based)', () => {

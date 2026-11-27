@@ -51,7 +51,8 @@ export interface RebuildProfileOptions {
    * Tags per card id. Tag posteriors cannot be derived from events alone,
    * because events carry no card metadata; the engine supplies this from the
    * ItemStore (or from `context.tags` when a card may have been evicted).
-   * Missing entries simply contribute no tag evidence.
+   * Missing entries fall back to `event.context.tags` when present, and
+   * contribute no tag evidence otherwise.
    */
   tagsByCardId?:
     | ReadonlyMap<string, readonly string[]>
@@ -60,10 +61,27 @@ export interface RebuildProfileOptions {
   now?: string
 }
 
-function tagsFor(source: RebuildProfileOptions['tagsByCardId'], cardId: string): readonly string[] {
-  if (!source) return []
-  if (source instanceof Map) return source.get(cardId) ?? []
-  return (source as Readonly<Record<string, readonly string[]>>)[cardId] ?? []
+function mappedTagsFor(
+  source: RebuildProfileOptions['tagsByCardId'],
+  cardId: string,
+): readonly string[] | undefined {
+  if (!source) return undefined
+  if (source instanceof Map) return source.get(cardId)
+  const record = source as Readonly<Record<string, readonly string[]>>
+  return Object.hasOwn(record, cardId) ? record[cardId] : undefined
+}
+
+function contextTagsFor(context: SwipeEvent['context']): readonly string[] {
+  const raw = context?.tags
+  if (!Array.isArray(raw)) return []
+  return raw.filter((tag): tag is string => typeof tag === 'string')
+}
+
+function tagsFor(
+  source: RebuildProfileOptions['tagsByCardId'],
+  event: SwipeEvent,
+): readonly string[] {
+  return mappedTagsFor(source, event.cardId) ?? contextTagsFor(event.context)
 }
 
 function normalizeTag(tag: string): string {
@@ -105,10 +123,10 @@ export function rebuildProfile(
     cardWeights.set(event.cardId, (cardWeights.get(event.cardId) ?? 0) + weight)
 
     const stats = tagStats
-    for (const tag of tagsFor(options.tagsByCardId, event.cardId)) {
+    for (const tag of tagsFor(options.tagsByCardId, event)) {
       const key = normalizeTag(tag)
-      if (!key) continue
-      const current = stats[key] ?? { a: 0, b: 0 }
+      if (!key || key === '__proto__') continue
+      const current = (Object.hasOwn(stats, key) ? stats[key] : undefined) ?? { a: 0, b: 0 }
       stats[key] = {
         a: current.a + Math.max(weight, 0),
         b: current.b + Math.max(-weight, 0),
