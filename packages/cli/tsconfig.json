@@ -5,6 +5,7 @@
     "paths": {
       "@swipeline/bench": ["../../packages/bench/src/index.ts"],
       "@swipeline/core": ["../../packages/core/src/index.ts"],
+      "@swipeline/rank": ["../../packages/rank/src/index.ts"],
       "@swipeline/server": ["../../packages/server/src/index.ts"],
       "@swipeline/store-sqlite": ["../../packages/store-sqlite/src/index.ts"]
     }
