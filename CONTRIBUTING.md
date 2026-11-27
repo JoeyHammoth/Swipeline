@@ -59,8 +59,10 @@ Useful scripts:
 ### Browser conformance
 
 `pnpm e2e` runs the shared binding conformance suite in Chromium against the
-fixture pages in `examples/conformance`, then checks the same page with axe. It
-needs a browser binary, which `pnpm install` does not fetch:
+fixture pages in `examples/conformance`, checks the same page with axe, and runs
+`e2e/accessibility-audit.spec.ts` — keyboard-only operation, 320 px reflow,
+target size, forced colours and reduced motion. It needs a browser binary, which
+`pnpm install` does not fetch:
 
 ```bash
 pnpm exec playwright install chromium   # once per machine; add --with-deps on Linux

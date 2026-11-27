@@ -1,0 +1,38 @@
+/*
+ * The Vue, Svelte and Web Component bindings ship no stylesheet: their READMEs
+ * tell a consumer to style the shared `swl-*` classes. This is that stylesheet,
+ * written the way the README describes, so the audit measures a deck that is
+ * actually presented rather than unstyled markup. React's fixture imports the
+ * stylesheet the package publishes instead.
+ */
+.swl-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.swl-actions button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 8px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #111827;
+  font: inherit;
+  cursor: pointer;
+}
+
+.swl-actions button:focus-visible,
+.swl-card:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .swl-card {
+    transition: opacity 150ms linear;
+    transform: none;
+  }
+}

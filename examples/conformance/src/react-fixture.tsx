@@ -1,6 +1,7 @@
 import { assertBindingConformance } from '@swipeline/binding-testkit'
 import { createEngine } from '@swipeline/core'
 import { SwipeDeck } from '@swipeline/react'
+import '@swipeline/react/styles.css'
 import { createRoot } from 'react-dom/client'
 import { createFixtureSource } from './fixture-source'
 

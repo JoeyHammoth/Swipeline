@@ -83,8 +83,9 @@ deck, no framework imports outside binding packages, playground v0 live.
   the Expo smoke app (`examples/books-expo`); not yet launched on a device,
   simulator or emulator
 - [x] Adapter registry: schema-validated, with a generated docs catalog
-- [ ] Accessibility audit — automated axe (WCAG 2.0/2.1/2.2, A/AA) passes on
-  the four binding fixtures; the manual checklist in
+- [ ] Accessibility audit — automated axe (WCAG 2.0/2.1/2.2, A/AA) and the
+  keyboard, reflow, target-size, forced-colours and reduced-motion checks pass on
+  the four binding fixtures; the screen-reader and touch checklist in
   [the audit](reference/a11y-audit.md) is not done
 - [x] OpenAPI specification for the server (`GET /openapi.json`)
 - [x] Theming kit: `@swipeline/theme` with both palettes and CSS output

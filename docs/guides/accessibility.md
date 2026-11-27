@@ -61,8 +61,12 @@ screen. The overlay labels appear without scaling.
 ## Testing it
 
 - `axe` runs with the `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa` and `wcag22aa`
-  tags against the four binding fixture pages in the `e2e` workflow. The example
-  apps are not scanned yet.
+  tags against the four binding fixture pages in the `e2e` workflow, in the
+  default theme and with forced colours active. The example apps are not scanned
+  yet.
+- `e2e/accessibility-audit.spec.ts` drives each binding with the keyboard only,
+  checks reflow at 320 CSS px, measures every action's target size, and advances
+  the deck with reduced motion emulated.
 - The binding conformance suite includes a keyboard-only path and a
   reduced-motion path.
 - Manual checks before a release: VoiceOver on macOS/iOS, TalkBack on Android,

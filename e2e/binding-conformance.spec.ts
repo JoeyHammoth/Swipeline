@@ -1,5 +1,6 @@
-import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
+import { accessibilityViolations } from './axe'
+import { deckText } from './deck'
 
 /**
  * The package tests run the suite under jsdom. These run the same assertions in a
@@ -15,6 +16,13 @@ for (const name of FIXTURES) {
     page.on('pageerror', (error) => pageErrors.push(error.message))
 
     await page.goto(`/${name}.html`)
+    // Scan the page before the suite runs: the suite tears its deck down, and an
+    // empty page passes every axe rule.
+    await expect(page.locator('[role="application"]').first()).toBeVisible()
+    // A page that renders nothing passes every axe rule, so prove a card is up.
+    await expect.poll(() => deckText(page)).toContain('First card')
+    expect(await accessibilityViolations(page)).toEqual([])
+
     const report = await page.evaluate(async () => {
       const fixture = window as Window & {
         __swipelineConformance?: () => Promise<{ binding: string; checks: number }>
@@ -27,19 +35,5 @@ for (const name of FIXTURES) {
 
     expect(pageErrors).toEqual([])
     expect(report).toEqual({ binding: name, checks: 7 })
-
-    // WCAG 2.0, 2.1 and 2.2 at levels A and AA. The newer rule sets are what
-    // catch focus-not-obscured, dragging alternatives and target size, which the
-    // 2.0 tags alone do not include.
-    const accessibility = await new AxeBuilder({ page })
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
-      .analyze()
-    expect(
-      accessibility.violations.map((violation) => ({
-        id: violation.id,
-        impact: violation.impact,
-        nodes: violation.nodes.map((node) => node.target),
-      })),
-    ).toEqual([])
   })
 }
