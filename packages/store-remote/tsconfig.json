@@ -4,6 +4,7 @@
     "types": ["node"],
     "paths": {
       "@swipeline/core": ["../../packages/core/src/index.ts"],
+      "@swipeline/rank": ["../../packages/rank/src/index.ts"],
       "@swipeline/server": ["../../packages/server/src/index.ts"],
       "@swipeline/store-memory": ["../../packages/store-memory/src/index.ts"]
     }
