@@ -1,6 +1,6 @@
 {
   "name": "@swipeline/adapter-themealdb",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "TheMealDB source adapter for Swipeline: meals to Cards with images, area and category.",
   "license": "Apache-2.0",
   "type": "module",

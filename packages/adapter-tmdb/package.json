@@ -1,6 +1,6 @@
 {
   "name": "@swipeline/adapter-tmdb",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "TMDB source adapter for Swipeline: movies to Cards with posters and ratings.",
   "license": "Apache-2.0",
   "type": "module",

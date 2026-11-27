@@ -1,5 +1,15 @@
 # @swipeline/cli
 
+## 0.4.0
+
+### Patch Changes
+
+- @swipeline/adapter-http-json@0.4.0
+  - @swipeline/bench@0.4.0
+  - @swipeline/core@0.4.0
+  - @swipeline/server@0.4.0
+  - @swipeline/store-sqlite@0.4.0
+
 ## 0.3.0
 
 ### Minor Changes

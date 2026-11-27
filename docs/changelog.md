@@ -36,7 +36,13 @@ Before 1.0, a minor version may include breaking changes. They are marked clearl
 in the changeset and the release note, with a migration note. After 1.0, breaking
 changes require a major and at least one minor release of deprecation warnings.
 
-## Status
+## Releases
 
-No releases yet. The first publishable version is v0.1 (milestone M1); until then
-the repository history is the changelog and the [roadmap](/roadmap) is the plan.
+| Version | Notes |
+|---|---|
+| 0.4.0 | [Vue, Svelte and React Native bindings](/releases/0.4.0) |
+| 0.3.0 | [Server, CLI and the M3 surface](/releases/0.3.0) |
+
+Nothing is on npm yet: trusted publishing is blocked on the npm organisation and
+the repository transfer, so these versions exist in the repository and not in a
+registry.

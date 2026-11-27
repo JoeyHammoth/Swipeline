@@ -1,6 +1,6 @@
 {
   "name": "@swipeline/adapter-openlibrary",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Open Library source adapter for Swipeline: search results to Cards with cover images.",
   "license": "Apache-2.0",
   "type": "module",

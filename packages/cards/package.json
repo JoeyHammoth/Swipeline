@@ -1,6 +1,6 @@
 {
   "name": "@swipeline/cards",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Framework-free card templates: which fields of a Card a template shows, in order.",
   "license": "Apache-2.0",
   "type": "module",

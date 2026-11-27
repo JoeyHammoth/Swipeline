@@ -1,5 +1,14 @@
 # @swipeline/react
 
+## 0.4.0
+
+### Patch Changes
+
+- @swipeline/cards@0.4.0
+  - @swipeline/core@0.4.0
+  - @swipeline/gestures@0.4.0
+  - @swipeline/i18n@0.4.0
+
 ## 0.3.0
 
 ### Minor Changes

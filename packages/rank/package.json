@@ -1,6 +1,6 @@
 {
   "name": "@swipeline/rank",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Ranking stages, default pipeline and explanations for Swipeline decks.",
   "license": "Apache-2.0",
   "type": "module",

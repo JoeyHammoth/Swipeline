@@ -1,6 +1,6 @@
 {
   "name": "@swipeline/gestures",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Framework-free pointer, keyboard and reduced-motion controller for Swipeline decks.",
   "license": "Apache-2.0",
   "type": "module",

@@ -1,6 +1,6 @@
 {
   "name": "@swipeline/core",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Schemas, types, config and the headless deck engine for Swipeline.",
   "license": "Apache-2.0",
   "type": "module",
