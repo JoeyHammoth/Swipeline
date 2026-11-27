@@ -21,9 +21,9 @@ console.log(running.url) // http://127.0.0.1:8787
 | `POST` | `/events` | Implemented — validates, is idempotent by event id, rejects a body over `maxBodyBytes` |
 | `GET` | `/export/:actor` | Implemented — JSONL, honours `deckId`, `since`, `until`, `afterId`, `limit` |
 | `DELETE` | `/actors/:actor` | Implemented |
-| `GET` | `/deck/:id/next` | Planned (needs the item store and ranking) |
-| `GET` | `/collections/:id` | Planned |
-| `GET` | `/openapi.json` | Planned |
+| `GET` | `/deck/:id/next` | Implemented — ranked cards, needs `items` in the options |
+| `GET` | `/collections/:id` | Implemented — `later` today |
+| `GET` | `/openapi.json` | Implemented — OpenAPI 3.1 for the routes above |
 
 `POST /events` accepts either an array or `{ "events": [...] }`.
 
@@ -60,9 +60,21 @@ next to this package:
 
 `swipeline serve --db ./swipes.db` wires the SQLite store for you.
 
+## Ranking and collections
+
+`GET /deck/:id/next` runs `defaultPipeline()` from `@swipeline/rank` over the
+server's `ItemStore` and the actor's events, so a client sees the same order on
+every device. Pass `rank` to substitute a pipeline and `rng`/`now` to make it
+reproducible. `GET /collections/:id` serves `later` — the cards whose most recent
+effective action was `later`, with undo taken into account.
+
+```ts
+createServer({ events, items, rank: myPipeline })
+```
+
 ## Not here yet
 
-Server-side ranking, collections, the OpenAPI document and webhook delivery from
-this process. Webhooks are a `Sink` from `@swipeline/sinks`; the server exposes
-history and leaves delivery to the caller. The route list above is the honest
-coverage; the design plan's M3 section has the rest.
+Webhook delivery from this process: a webhook is a `Sink` from
+`@swipeline/sinks`, and the server exposes history and leaves delivery to the
+caller. Further collections (`starred`, shared decks) are additive. The route
+list above is the honest coverage, and `/openapi.json` is generated from it.

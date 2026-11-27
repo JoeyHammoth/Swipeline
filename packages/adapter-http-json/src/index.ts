@@ -2,6 +2,7 @@ import {
   type Card,
   type CardAttribution,
   cardId,
+  type DeckManifestSource,
   type FetchContext,
   type SourceAdapter,
   safeParseCard,
@@ -14,6 +15,8 @@ export type PaginationMode = 'page' | 'offset' | 'cursor' | 'none'
 
 export interface PaginationConfig {
   mode: PaginationMode
+  /** Alias for `mode`, so a deck manifest's `type` passes straight through. */
+  type?: PaginationMode
   /** Query parameter that carries the page/offset/cursor. Defaults per mode. */
   param?: string
   /** Rows requested per page; also used to detect the last page. Defaults to 20. */
@@ -181,7 +184,7 @@ function delay(ms: number): Promise<void> {
 export function createHttpJsonAdapter(config: HttpJsonAdapterConfig): HttpJsonAdapter {
   const pagination: PaginationConfig = config.pagination ?? { mode: 'none' }
   const pageSize = pagination.pageSize ?? DEFAULT_PAGE_SIZE
-  const mode = pagination.mode
+  const mode = pagination.type ?? pagination.mode
   const fetchImpl = config.fetch ?? globalThis.fetch
   if (typeof fetchImpl !== 'function') {
     throw new TypeError('createHttpJsonAdapter needs a fetch implementation')
@@ -366,4 +369,44 @@ export function createHttpJsonAdapter(config: HttpJsonAdapterConfig): HttpJsonAd
     },
   }
   return adapter
+}
+
+/** The documented name for `createHttpJsonAdapter`; used in deck configs. */
+export const httpJson = createHttpJsonAdapter
+
+/**
+ * Turns a deck manifest's `source` block into an adapter config. Manifest keys
+ * are optional-but-present, which `exactOptionalPropertyTypes` rejects, so each
+ * one is copied only when the manifest actually sets it.
+ */
+export function httpJsonSourceConfig(source: DeckManifestSource): HttpJsonAdapterConfig {
+  const map: FieldMap = { id: source.map.id, title: source.map.title }
+  if (source.map.subtitle !== undefined) map.subtitle = source.map.subtitle
+  if (source.map.body !== undefined) map.body = source.map.body
+  if (source.map.tags !== undefined) map.tags = source.map.tags
+  if (source.map.url !== undefined) map.url = source.map.url
+  if (source.map.media !== undefined) map.media = source.map.media
+  if (source.map.facts !== undefined) map.facts = source.map.facts
+  if (source.map.extra !== undefined) map.extra = source.map.extra
+
+  const config: HttpJsonAdapterConfig = { id: source.id, url: source.url, map }
+  if (source.itemsPath !== undefined) config.itemsPath = source.itemsPath
+  if (source.attribution !== undefined) {
+    config.attribution = { text: source.attribution.text, url: source.attribution.url }
+  }
+  if (source.queryParam !== undefined) config.queryParam = source.queryParam
+  if (source.filters !== undefined) config.filters = source.filters
+
+  if (source.pagination !== undefined) {
+    const pagination: PaginationConfig = { mode: source.pagination.type ?? 'none' }
+    if (source.pagination.param !== undefined) pagination.param = source.pagination.param
+    if (source.pagination.pageSize !== undefined) {
+      pagination.pageSize = source.pagination.pageSize
+    }
+    if (source.pagination.start !== undefined) pagination.start = source.pagination.start
+    if (source.pagination.nextPath !== undefined) pagination.nextPath = source.pagination.nextPath
+    config.pagination = pagination
+  }
+
+  return config
 }

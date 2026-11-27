@@ -3,7 +3,17 @@ import {
   type IncomingMessage,
   type ServerResponse,
 } from 'node:http'
-import { type EventQuery, type EventStore, parseSwipeEvent, type SwipeEvent } from '@swipeline/core'
+import {
+  compareEvents,
+  type EventQuery,
+  type EventStore,
+  type ItemStore,
+  parseSwipeEvent,
+  rebuildProfile,
+  type SwipeAction,
+  type SwipeEvent,
+} from '@swipeline/core'
+import { defaultPipeline, type RankContext, type RankStage } from '@swipeline/rank'
 
 /** What `authenticate` may return. `undefined` is internal: no hook configured. */
 export type AuthResult = { actor: string } | null
@@ -11,6 +21,14 @@ export type AuthResult = { actor: string } | null
 export interface ServerOptions {
   /** Append-only log. Pass a durable store in production. */
   events: EventStore
+  /** Card cache. Required by `GET /deck/:id/next` and `GET /collections/:id`. */
+  items?: ItemStore
+  /** Ranking pipeline. Defaults to `defaultPipeline()` from `@swipeline/rank`. */
+  rank?: RankStage
+  /** Injected RNG, so ranking is reproducible in tests. Defaults to `Math.random`. */
+  rng?: () => number
+  /** Injected clock for the rank context. */
+  now?: () => number
   /**
    * Resolve the caller's actor from the request, or `null` to reject with 401.
    * When set, every event in a batch must belong to that actor.
@@ -36,7 +54,10 @@ export interface SwipelineServer {
 }
 
 const DEFAULT_MAX_BODY = 1024 * 1024
+const DEFAULT_DECK_LIMIT = 20
+const MAX_DECK_LIMIT = 100
 const SERVICE = 'swipeline-server'
+const COLLECTIONS = new Set(['later'])
 
 class BodyTooLargeError extends Error {
   constructor(limit: number) {
@@ -91,6 +112,22 @@ function allowedOrigin(
   return origins.includes(origin) ? origin : undefined
 }
 
+/**
+ * Undo is compensating, so the applied history is the event list with each undo
+ * removing the event before it. Collections and profiles both read this view.
+ */
+function appliedEvents(events: readonly SwipeEvent[]): SwipeEvent[] {
+  const applied: SwipeEvent[] = []
+  for (const event of [...events].sort(compareEvents)) {
+    if (event.action === 'undo') {
+      applied.pop()
+      continue
+    }
+    applied.push(event)
+  }
+  return applied
+}
+
 async function readJsonBody(request: IncomingMessage, limit: number): Promise<unknown> {
   const chunks: Buffer[] = []
   let size = 0
@@ -111,6 +148,101 @@ function methodNotAllowed(
   cors: Record<string, string>,
 ): void {
   sendJson(response, 405, { error: 'method not allowed' }, { ...cors, allow })
+}
+
+/** The OpenAPI document for the routes this server actually implements. */
+function openApiDocument(version: string): Record<string, unknown> {
+  const actorQuery = {
+    name: 'actor',
+    in: 'query',
+    required: false,
+    schema: { type: 'string' },
+    description: 'Actor to read. Required unless an auth hook resolves one.',
+  }
+  return {
+    openapi: '3.1.0',
+    info: {
+      title: 'Swipeline server',
+      version,
+      license: { name: 'Apache-2.0', identifier: 'Apache-2.0' },
+    },
+    paths: {
+      '/health': {
+        get: {
+          summary: 'Liveness and version',
+          responses: { '200': { description: 'The service is up' } },
+        },
+      },
+      '/events': {
+        post: {
+          summary: 'Append swipe events, idempotently by event id',
+          requestBody: {
+            required: true,
+            content: { 'application/json': { schema: { type: 'object' } } },
+          },
+          responses: {
+            '202': { description: 'Accepted' },
+            '400': { description: 'Invalid events' },
+            '401': { description: 'Unauthorized' },
+            '403': { description: 'Actor mismatch' },
+            '413': { description: 'Body over maxBodyBytes' },
+          },
+        },
+      },
+      '/export/{actor}': {
+        get: {
+          summary: "One actor's history as JSONL",
+          parameters: [
+            { name: 'actor', in: 'path', required: true, schema: { type: 'string' } },
+            { name: 'deckId', in: 'query', schema: { type: 'string' } },
+            { name: 'since', in: 'query', schema: { type: 'string', format: 'date-time' } },
+            { name: 'until', in: 'query', schema: { type: 'string', format: 'date-time' } },
+            { name: 'afterId', in: 'query', schema: { type: 'string' } },
+            { name: 'limit', in: 'query', schema: { type: 'integer', minimum: 1 } },
+          ],
+          responses: { '200': { description: 'application/x-ndjson body' } },
+        },
+      },
+      '/actors/{actor}': {
+        delete: {
+          summary: 'Erase an actor and their derived profiles',
+          parameters: [{ name: 'actor', in: 'path', required: true, schema: { type: 'string' } }],
+          responses: { '200': { description: 'Count of erased events' } },
+        },
+      },
+      '/deck/{id}/next': {
+        get: {
+          summary: 'Ranked cards for one actor and deck',
+          parameters: [
+            { name: 'id', in: 'path', required: true, schema: { type: 'string' } },
+            actorQuery,
+            {
+              name: 'limit',
+              in: 'query',
+              schema: { type: 'integer', minimum: 1, maximum: 100, default: 20 },
+            },
+          ],
+          responses: {
+            '200': { description: 'Cards in rank order, with optional reasons' },
+            '501': { description: 'This server has no item store configured' },
+          },
+        },
+      },
+      '/collections/{id}': {
+        get: {
+          summary: 'Cards an actor saved to a collection (`later` today)',
+          parameters: [
+            { name: 'id', in: 'path', required: true, schema: { type: 'string', enum: ['later'] } },
+            actorQuery,
+          ],
+          responses: {
+            '200': { description: 'Cards in the collection' },
+            '404': { description: 'Unknown collection' },
+          },
+        },
+      },
+    },
+  }
 }
 
 export function createServer(options: ServerOptions): SwipelineServer {
@@ -249,6 +381,149 @@ export function createServer(options: ServerOptions): SwipelineServer {
     sendJson(response, 200, { erased }, cors)
   }
 
+  const openApi = openApiDocument(options.version ?? '0.0.0')
+
+  type ActorResolution = { ok: true; actor: string } | { ok: false }
+
+  async function resolveActor(
+    request: IncomingMessage,
+    url: URL,
+    response: ServerResponse,
+    cors: Record<string, string>,
+    mismatch: string,
+  ): Promise<ActorResolution> {
+    const auth = await authorize(request)
+    if (auth === null) {
+      sendJson(response, 401, { error: 'unauthorized' }, cors)
+      return { ok: false }
+    }
+    const actor = url.searchParams.get('actor') ?? auth?.actor
+    if (!actor) {
+      sendJson(response, 400, { error: 'actor is required' }, cors)
+      return { ok: false }
+    }
+    if (auth && auth.actor !== actor) {
+      sendJson(response, 403, { error: mismatch }, cors)
+      return { ok: false }
+    }
+    return { ok: true, actor }
+  }
+
+  async function deckNext(
+    deckId: string,
+    url: URL,
+    request: IncomingMessage,
+    response: ServerResponse,
+    cors: Record<string, string>,
+  ): Promise<void> {
+    const resolved = await resolveActor(
+      request,
+      url,
+      response,
+      cors,
+      'cannot rank for another actor',
+    )
+    if (!resolved.ok) return
+
+    const items = options.items
+    if (!items) {
+      sendJson(response, 501, { error: 'GET /deck/:id/next needs an item store' }, cors)
+      return
+    }
+
+    let limit = DEFAULT_DECK_LIMIT
+    const limitRaw = url.searchParams.get('limit')
+    if (limitRaw !== null) {
+      const parsed = Number(limitRaw)
+      if (!Number.isInteger(parsed) || parsed <= 0 || parsed > MAX_DECK_LIMIT) {
+        sendJson(
+          response,
+          400,
+          { error: `limit must be an integer between 1 and ${MAX_DECK_LIMIT}` },
+          cors,
+        )
+        return
+      }
+      limit = parsed
+    }
+
+    const allCards = await items.list()
+    const events = await options.events.query({ actor: resolved.actor, deckId })
+    const seen = new Set(events.map((event) => event.cardId))
+    // Filtering here as well as in `seenFilter` keeps the route correct when a
+    // caller supplies a pipeline that does not include that stage.
+    const cards = allCards.filter((card) => !seen.has(card.id))
+    const tagsByCardId = new Map(allCards.map((card) => [card.id, card.tags ?? []]))
+    const now = options.now?.()
+    const profile = rebuildProfile(events, {
+      actor: resolved.actor,
+      deckId,
+      tagsByCardId,
+      ...(now === undefined ? {} : { now: new Date(now).toISOString() }),
+    })
+    const context: RankContext = {
+      actor: resolved.actor,
+      deckId,
+      candidates: cards.map((card) => ({ card, score: 1 })),
+      profile,
+      limit,
+      rng: options.rng ?? Math.random,
+      seen,
+      ...(now === undefined ? {} : { now }),
+    }
+    const ranked = await (options.rank ?? defaultPipeline()).run(context)
+    const chosen = ranked.candidates.slice(0, limit)
+    const reasons = chosen
+      .filter((candidate) => (candidate.reasons?.length ?? 0) > 0)
+      .map((candidate) => ({ cardId: candidate.card.id, reasons: candidate.reasons ?? [] }))
+
+    sendJson(
+      response,
+      200,
+      { deckId, actor: resolved.actor, cards: chosen.map((candidate) => candidate.card), reasons },
+      cors,
+    )
+  }
+
+  async function collection(
+    id: string,
+    url: URL,
+    request: IncomingMessage,
+    response: ServerResponse,
+    cors: Record<string, string>,
+  ): Promise<void> {
+    const resolved = await resolveActor(
+      request,
+      url,
+      response,
+      cors,
+      'cannot read another actor’s collection',
+    )
+    if (!resolved.ok) return
+
+    if (!COLLECTIONS.has(id)) {
+      sendJson(response, 404, { error: `unknown collection: ${id}` }, cors)
+      return
+    }
+    const items = options.items
+    if (!items) {
+      sendJson(response, 501, { error: 'GET /collections/:id needs an item store' }, cors)
+      return
+    }
+
+    const events = await options.events.query({ actor: resolved.actor })
+    const lastAction = new Map<string, SwipeAction>()
+    for (const event of appliedEvents(events)) lastAction.set(event.cardId, event.action)
+
+    const cards = []
+    for (const [cardId, action] of lastAction) {
+      if (action !== 'later') continue
+      const card = await items.get(cardId)
+      if (card) cards.push(card)
+    }
+    sendJson(response, 200, { id, actor: resolved.actor, cards }, cors)
+  }
+
   async function handler(request: IncomingMessage, response: ServerResponse): Promise<void> {
     const url = new URL(request.url ?? '/', 'http://localhost')
     const parts = url.pathname.split('/').filter(Boolean)
@@ -287,6 +562,24 @@ export function createServer(options: ServerOptions): SwipelineServer {
       if (parts.length === 2 && parts[0] === 'actors') {
         if (request.method !== 'DELETE') return methodNotAllowed(response, 'DELETE', cors)
         await eraseActor(decodeURIComponent(parts[1] ?? ''), request, response, cors)
+        return
+      }
+
+      if (parts.length === 1 && parts[0] === 'openapi.json') {
+        if (request.method !== 'GET') return methodNotAllowed(response, 'GET', cors)
+        sendJson(response, 200, openApi, cors)
+        return
+      }
+
+      if (parts.length === 3 && parts[0] === 'deck' && parts[2] === 'next') {
+        if (request.method !== 'GET') return methodNotAllowed(response, 'GET', cors)
+        await deckNext(decodeURIComponent(parts[1] ?? ''), url, request, response, cors)
+        return
+      }
+
+      if (parts.length === 2 && parts[0] === 'collections') {
+        if (request.method !== 'GET') return methodNotAllowed(response, 'GET', cors)
+        await collection(decodeURIComponent(parts[1] ?? ''), url, request, response, cors)
         return
       }
 

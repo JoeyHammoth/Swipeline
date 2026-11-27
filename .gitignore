@@ -43,3 +43,6 @@ pnpm-debug.log*
 *.db-journal
 *.sqlite
 *.sqlite-vec
+
+# Scaffolded by scripts/check-templates.mjs; never committed.
+examples/scaffold-*/

@@ -61,14 +61,19 @@ deck, no framework imports outside binding packages, playground v0 live.
 - [x] `sinks`: signed webhook (HMAC-SHA256, replay window) and JSONL
 - [x] `cli`: `serve`, `validate`, help and exit codes 0/1/2
 - [x] `cli`: bench, export, import, doctor
-- [ ] `cli`: init, source add, dev
-- [ ] `create-swipeline` templates; trusted publishing wired up
+- [x] `cli`: init, source add, dev
+- [x] `create-swipeline` templates: blank, books, papers, recipes and products,
+  scaffolded and built by `quickstart.yml`
+- [ ] trusted publishing wired up — blocked on the npm organisation and the
+  repository transfer (#1)
 - Acceptance: offline-then-online sync passes; webhook delivery is idempotent;
   scaffold-and-build nightly job is green
 - Offline-then-online sync is covered by `store-remote` tests against a real
   in-process server, and webhook idempotency by `sinks` tests that repeat a
-  batch and compare the delivery id. The scaffold-and-build nightly job waits on
-  `create-swipeline` and `swipeline init`.
+  batch and compare the delivery id. `quickstart.yml` scaffolds all five
+  templates and builds them on a schedule, against the workspace packages
+  because nothing is published yet; registry resolution is the gap the first
+  publish closes.
 
 ## M4 — v0.5: mobile and breadth
 

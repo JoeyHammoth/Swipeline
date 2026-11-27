@@ -51,12 +51,18 @@ Postgres is the same shape with `createPostgresStores({ client: pool })` from
 | `GET` | `/export/:actor?deckId=&since=&until=&afterId=&limit=` | Implemented — JSONL |
 | `DELETE` | `/actors/:actor` | Implemented |
 | `GET` | `/health` | Implemented |
-| `GET` | `/deck/:id/next?actor=…&limit=…` | Planned — needs the item store and ranking |
-| `GET` | `/collections/:id` | Planned |
-| `GET` | `/openapi.json` | Planned |
+| `GET` | `/deck/:id/next?actor=…&limit=…` | Implemented — ranked cards; needs `items` in the server options |
+| `GET` | `/collections/:id?actor=…` | Implemented — `later` today |
+| `GET` | `/openapi.json` | Implemented — OpenAPI 3.1 for the routes above |
 
 `POST /events` accepts an array or `{ "events": [...] }`. Duplicate ids are
 dropped by the store, so a client can retry a batch safely.
+
+`GET /deck/:id/next` runs the same `defaultPipeline` the client runs, so ranking
+is consistent across devices. Pass `items` (an `ItemStore` loaded with the cards)
+and the route returns them in rank order, skipping anything the actor already
+swiped, with `reasons` where a stage added them. Without an item store the route
+answers 501 rather than pretending the deck is empty.
 
 ## Authentication
 

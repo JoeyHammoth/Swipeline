@@ -1,154 +1,143 @@
 # Deck configuration
 
-A deck is configured in `deck.config.ts` (code) or `*.deck.json` (a manifest, data
-only). Precedence, lowest to highest: **built-in defaults → config file →
-environment variables → runtime props**.
+A deck is configured one of two ways:
 
-## Shape
+- **`swipeline.deck.json`** — a manifest of data only, written by
+  `swipeline init` and edited by `swipeline source add`. `swipeline dev` reads it.
+- **`deck.config.ts`** — code, for a hand-written adapter, a custom ranker or a
+  store that needs a function. The templates from `create-swipeline` use this.
 
-```ts
-interface DeckConfig {
-  id: string
-  source: SourceAdapter | HttpJsonOptions | DeckManifestSource
-  store?: ItemStore | EventStore | ProfileStore
-  items?: ItemStore
-  events?: EventStore
-  profiles?: ProfileStore
-  embedder?: Embedder
-  index?: VectorIndex
-  rank?: RankStage
-  actions?: Partial<Record<'right' | 'left' | 'up' | 'down', SwipeAction>>
-  prefetch?: { buffer: number; refillAt: number }
-  undoDepth?: number
-  sinks?: Sink[]
-  consent?: ConsentPolicy
-  template?: 'text' | 'media' | 'facts' | 'compare'
-  theme?: ThemeTokens
+Precedence, lowest to highest: **built-in defaults → config file → environment
+variables → runtime props**.
+
+## Manifest (`swipeline.deck.json`)
+
+```json
+{
+  "id": "books",
+  "actor": "local",
+  "source": {
+    "type": "http-json",
+    "id": "openlibrary",
+    "url": "https://openlibrary.org/search.json?q={query}&page={page}",
+    "itemsPath": "docs",
+    "map": { "id": "key", "title": "title", "subtitle": "author_name[0]" },
+    "pagination": { "type": "page", "param": "page", "pageSize": 20 },
+    "attribution": { "text": "Data from Open Library", "url": "https://openlibrary.org" }
+  },
+  "actions": { "right": "like", "left": "dislike" },
+  "prefetch": { "buffer": 8, "refillAt": 3 },
+  "undoDepth": 5,
+  "template": "media"
 }
 ```
 
-Unknown keys are rejected with an actionable error at startup. Everything except
-functions and adapters is serializable, which is what makes a manifest possible.
+| Key | Required | Notes |
+|---|---|---|
+| `id` | yes | Lower-case letters, digits and dashes; used as the deck id |
+| `actor` | no | Local actor the playground swipes as. Defaults to `local` |
+| `source` | yes | Only `http-json` today (see below) |
+| `actions` | no | Gesture-to-action overrides; custom action names are allowed |
+| `prefetch` | no | `buffer` and `refillAt`, both bounded |
+| `undoDepth` | no | 0–50 |
+| `template` | no | `text`, `media`, `facts` or `compare` |
+
+Every object is strict: an unknown key is an error at startup, not a silently
+ignored typo. `parseDeckManifest` throws a Zod error with the offending path.
+
+The manifest cannot express rank stages yet. The ranker is the default pipeline;
+a custom pipeline needs `deck.config.ts`.
 
 ## `source`
 
-Three forms:
+Declarative HTTP/JSON mapping:
 
 ```ts
-// 1. Declarative HTTP/JSON mapping
+import { httpJson } from '@swipeline/adapter-http-json'
+
 source: httpJson({
   id: 'openlibrary',
   url: 'https://openlibrary.org/search.json?q={query}&limit=50&page={page}',
-  pagination: { type: 'page', param: 'page' },
+  pagination: { mode: 'page', param: 'page' },
   itemsPath: 'docs',
   map: { id: 'key', title: 'title', subtitle: 'author_name[0]', tags: 'subject[:8]' },
   attribution: { text: 'Data from Open Library', url: 'https://openlibrary.org' },
 })
-
-// 2. An installed adapter package
-source: arxiv({ categories: ['cs.LG'] })
-
-// 3. Your own implementation
-source: myPapersAdapter
 ```
+
+`type` is accepted as an alias for `mode` in a manifest, so the JSON block above
+and the TypeScript call describe the same adapter.
+
+Installed adapter packages export their own factory (`createOpenLibraryAdapter`,
+`createArxivAdapter`, …), and a `SourceAdapter` you write by hand works anywhere
+the factory does.
 
 ### Field expression grammar
 
 | Syntax | Meaning |
 |---|---|
-| `a.b.c` | nested property |
-| `items[0]` | array index |
-| `tags[:8]` | first eight items |
-| `{cover_i}` in a URL | interpolation from the same record |
-| `"literal"` | literal when the value starts with a quote |
+| `a.b.c` | Nested property |
+| `items[0]` | Array index |
+| `tags[:8]` | First eight items |
+| `""` (empty string) | The whole record |
 
 Missing paths resolve to `undefined`; a card that fails the schema is dropped and
 counted. Field mapping never executes code.
 
 ### Pagination
 
-| Form | Options |
+| `mode` / `type` | Options |
 |---|---|
-| `{ type: 'page', param: 'page' }` | Increments a page number |
-| `{ type: 'offset', param: 'offset', limitParam, limit }` | Offset/limit |
-| `{ type: 'cursor', param: 'cursor', nextPath: 'next' }` | Reads the next cursor from the response |
-| `{ type: 'none' }` | One request |
+| `page` | `param` (default `page`), `pageSize`, `start` |
+| `offset` | `param` (default `offset`), `pageSize`, `start` |
+| `cursor` | `param`, `nextPath` (default `next`) |
+| `none` | One request |
 
-## `store`
+The URL can also carry `{page}`, `{offset}`, `{cursor}`, `{limit}` and `{query}`
+placeholders instead of query parameters.
 
-Shorthands install all three stores; finer control uses `items`, `events`,
-`profiles` separately.
+## Code config (`deck.config.ts`)
 
-```ts
-store: memoryStore()            // ephemeral
-store: indexedDbStore({ name: 'swipeline', version: 1 })
-store: remoteStore({ url, token: () => getJwt() })
-```
-
-## `rank`
+The file exports an object the app spreads into `createEngine`:
 
 ```ts
-rank: pipeline(
-  seenFilter(),
-  hardFilters({ minPrice: 0, maxPrice: 500, excludeTags: ['ads'] }),
-  tagAffinity({ weight: 0.4 }),
-  prefVector({ weight: 0.6, dislikeDiscount: 0.5, halfLifeDays: 30 }),
-  thompson({ strength: 0.15 }),
-  epsilonRandom({ epsilon: 0.05 }),
-  mmr({ lambda: 0.75 }),
-)
-```
+import { createOpenLibraryAdapter } from '@swipeline/adapter-openlibrary'
 
-Order matters. `seenFilter` first, diversification last, exploration before
-diversification. See [Ranking](/concepts/ranking).
-
-## `actions`
-
-```ts
-actions: { right: 'like', left: 'dislike', up: 'superlike', down: 'later' }
-```
-
-Custom actions (`buy`, `share`, `report`) are allowed; they are recorded as events
-with weight 0 unless you assign one. Every action must also be reachable by button
-and keyboard.
-
-## `prefetch` and `undoDepth`
-
-| Option | Default | Notes |
-|---|---|---|
-| `prefetch.buffer` | 8 | Cards kept ahead of the current one |
-| `prefetch.refillAt` | 3 | Refill when this many remain |
-| `undoDepth` | 5 | How many undos are offered |
-
-## `theme`
-
-```ts
-theme: { accent: '#25c2a0', radiusCard: 18, motion: 'full' | 'reduced' }
-```
-
-CSS custom properties for web, a token object for React Native, same names in both.
-
-## Manifest form
-
-```json
-{
-  "id": "books",
-  "source": {
-    "type": "http-json",
-    "id": "openlibrary",
-    "url": "https://openlibrary.org/search.json?q={query}&page={page}",
-    "pagination": { "type": "page", "param": "page" },
-    "itemsPath": "docs",
-    "map": { "id": "key", "title": "title" }
-  },
-  "rank": [
-    { "stage": "seenFilter" },
-    { "stage": "tagAffinity", "options": { "weight": 0.4 } },
-    { "stage": "mmr", "options": { "lambda": 0.75 } }
-  ],
-  "actions": { "right": "like", "left": "dislike" }
+export const deck = {
+  deckId: 'books',
+  actor: 'local-reader',
+  source: createOpenLibraryAdapter({ limit: 40 }),
 }
 ```
 
-Manifests name stages and options; they never embed code. An unknown stage or
-field is refused, which is what makes importing a shared manifest safe.
+```ts
+const engine = createEngine({ ...deck, events: stores.events })
+```
+
+`createEngine` takes the fields below; the binding (React, the Web Component)
+only ever sees the resulting store.
+
+| Field | Default | Meaning |
+|---|---|---|
+| `deckId` | required | Namespace for events and profiles |
+| `actor` | required | Actor id, or a function returning one |
+| `source` | required | A `SourceAdapter` |
+| `events` | `MemoryEventStore` | The append-only log |
+| `sinks` | none | Receivers for committed batches |
+| `consent` | none | Per-event gate on recording |
+| `actions` | right/like, left/dislike, up/superlike, down/later | Gesture map |
+| `prefetch.buffer` / `refillAt` | 8 / 3 | Cards kept ahead, refill threshold |
+| `undoDepth` | 5 | How many undos are offered |
+| `clock`, `idFactory` | real time, ULID | Injected in tests |
+
+## Stores
+
+There are no `store` shorthands in the config yet; pass the store explicitly.
+
+| Need | Call |
+|---|---|
+| Ephemeral | `createMemoryStores()` from `@swipeline/store-memory` |
+| Browser persistence | `createIndexedDbStores({ name })` from `@swipeline/store-indexeddb` |
+| Node, Bun, CLI | `createSqliteStores({ path })` from `@swipeline/store-sqlite` |
+| Postgres | `createPostgresStores({ client })` from `@swipeline/store-postgres` |
+| Sync to a server | `httpEventStore` + `createOutbox` from `@swipeline/store-remote` |

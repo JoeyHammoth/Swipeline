@@ -12,6 +12,13 @@ import { join } from 'node:path'
 
 const ROOT = new URL('..', import.meta.url).pathname
 const BINDING_PACKAGES = new Set(['react', 'react-native', 'vue', 'svelte', 'element'])
+/**
+ * Scaffolders emit framework projects as strings rather than importing a
+ * framework. The source scan matches import syntax in text, so their templates
+ * would trip a rule that does not apply to them; their declared dependencies are
+ * still checked, and they must not depend on a framework themselves.
+ */
+const SCAFFOLD_PACKAGES = new Set(['create-swipeline'])
 const FORBIDDEN = [
   'react',
   'react-dom',
@@ -75,7 +82,7 @@ for (const name of packageDirs) {
     const sourceDir = join(dir, 'src')
     let files = []
     try {
-      files = walk(sourceDir)
+      files = SCAFFOLD_PACKAGES.has(name) ? [] : walk(sourceDir)
     } catch {
       files = []
     }

@@ -1,15 +1,61 @@
 # @swipeline/cli
 
-The `swipeline` command. It runs the server, works with a portable JSONL history
-and runs the benchmark — all against the same SQLite file when you pass `--db`.
+The `swipeline` command. It writes a deck manifest, previews a deck, runs the
+server, works with a portable JSONL history and runs the benchmark — all against
+the same SQLite file when you pass `--db`.
 
 ```bash
+swipeline init . --template books
+swipeline dev
 swipeline serve --port 8787 --db ./swipes.db
 swipeline export ./swipes.db --actor reader > history.jsonl
 swipeline import ./swipes.db history.jsonl
-swipeline doctor --db ./swipes.db
 swipeline bench --gate
 ```
+
+## `swipeline init`
+
+Writes `swipeline.deck.json` and prints the install command for the framework it
+detects in `package.json`. It refuses to replace an existing manifest unless you
+pass `--force`.
+
+| Flag | Default | Meaning |
+|---|---|---|
+| `--template` | `books` | `blank`, `books`, `papers`, `recipes` or `products` |
+| `--id` | the template name | Deck id |
+| `--force` | off | Replace an existing manifest |
+
+## `swipeline source add`
+
+Fetches the URL once, finds the first array of objects, infers `id`, `title`,
+`subtitle`, `tags` and `url` from the first record, writes the `source` block and
+previews the cards it would produce.
+
+```text
+$ swipeline source add https://api.example.com/items
+Wrote swipeline.deck.json.
+source: api-example, itemsPath: items
+map: {"id":"id","title":"name","subtitle":"description"}
+  preview: Alpha — First
+```
+
+Inference is shallow by design: flat scalar fields only. Nested objects are left
+for you to map by hand, and the card preview shows what the mapping actually
+produces.
+
+## `swipeline dev`
+
+Loads the manifest, fetches one page from the source, and serves a playground on
+the same port as the real API: `/api/*` is the documented server surface, and
+`/dev/swipe` is a dev-only shortcut that records a swipe with a generated ULID.
+Swipes go to `.swipeline/dev.db` unless you pass `--db`.
+
+| Flag | Default | Meaning |
+|---|---|---|
+| `--config` | `swipeline.deck.json` | Manifest to load |
+| `--port` | `8787` | Listen port |
+| `--db` | `.swipeline/dev.db` | SQLite file for the event log |
+| `--actor` | the manifest's actor, else `local` | Who the playground swipes as |
 
 ## `swipeline serve`
 
@@ -72,8 +118,5 @@ which is what CI uses to catch a ranking regression.
 | `2` | Bad usage |
 | `3` | Benchmark regression (`bench --gate`) |
 
-## Planned
-
-`init`, `source add` and `dev` are the rest of the v0.3 contract. They need the
-deck config format and the playground that consume them, so they are not
-implemented yet rather than shipped as commands that write files nothing reads.
+New projects come from `create-swipeline` (`npm create swipeline@latest`), which is
+a separate binary.

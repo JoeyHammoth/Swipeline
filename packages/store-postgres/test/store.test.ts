@@ -4,8 +4,10 @@ import { describe, expect, it } from 'vitest'
 import { createPostgresStores } from '../src/index.js'
 
 // One PGlite instance for the whole suite; starting Postgres costs about two
-// seconds, so the tables are truncated between tests instead.
+// seconds, so the tables are truncated between tests instead. The warm-up pays
+// the WASM start here rather than inside the suite's first `beforeEach`.
 const shared = new PGlite()
+await shared.query('select 1')
 
 describeStoreConformance('postgres stores', async () => {
   const stores = await createPostgresStores({ client: shared })

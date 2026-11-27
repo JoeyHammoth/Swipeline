@@ -1,6 +1,5 @@
 export type { FetchContext, SourceAdapter } from './adapter.js'
 export type { Card, CardAttribution, CardFact, CardMedia } from './card.js'
-
 export {
   attributionSchema,
   cardSchema,
@@ -9,6 +8,13 @@ export {
   parseCard,
   safeParseCard,
 } from './card.js'
+export type { DeckManifest, DeckManifestSource } from './config.js'
+export {
+  deckManifestSchema,
+  deckManifestSourceSchema,
+  defineDeck,
+  parseDeckManifest,
+} from './config.js'
 export type {
   DeckCommand,
   DeckError,

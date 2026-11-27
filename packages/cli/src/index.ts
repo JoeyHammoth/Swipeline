@@ -1,5 +1,5 @@
 import { constants, existsSync } from 'node:fs'
-import { access, readFile, writeFile } from 'node:fs/promises'
+import { access, mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname } from 'node:path'
 import type { BenchReport, StrategyName } from '@swipeline/bench'
 import { runBenchmark } from '@swipeline/bench'
@@ -11,10 +11,23 @@ import {
 } from '@swipeline/core'
 import { createServer } from '@swipeline/server'
 import { createSqliteStores } from '@swipeline/store-sqlite'
+import { createDevServer } from './dev.js'
+import {
+  addSource,
+  CONFIG_FILE,
+  frameworkHint,
+  initDeck,
+  loadManifest,
+  TEMPLATE_NAMES,
+  type TemplateName,
+} from './init.js'
 
 export const USAGE = `swipeline - decks from any source, ranked locally
 
 Usage:
+  swipeline init [dir] [--template <name>] [--id <deckId>] [--force]
+  swipeline source add <url> [--id <sourceId>] [--config <file>] [--deck <deckId>]
+  swipeline dev [--config <file>] [--port <port>] [--db <file>] [--actor <id>]
   swipeline serve [--port <port>] [--host <host>] [--cors <origin>]... [--db <file>]
   swipeline validate <history.jsonl>
   swipeline export <swipes.db> [--actor <id>] [--deck <id>] [--since <iso>] [--until <iso>] [--after <ulid>] [--limit <n>] [--out <file>]
@@ -23,6 +36,9 @@ Usage:
   swipeline bench [--seed <n>] [--users <n>] [--cards <n>] [--k <n>] [--gate]
   swipeline help
 
+init      Write a deck manifest into a project.
+source    Add or replace the source mapping in a deck manifest.
+dev       Preview a deck against its source and record swipes locally.
 serve     Run the HTTP API, optionally backed by a SQLite file.
 validate  Check a JSONL history export against the SwipeEvent schema.
 export    Write a stored history as JSONL.
@@ -60,6 +76,12 @@ export type BenchRunner = (options: {
   cards?: number
   k?: number
 }) => Promise<BenchReport>
+
+/** Everything the commands reach outside the process, so tests can replace it. */
+export interface CliDeps {
+  benchmark?: BenchRunner
+  fetch?: typeof globalThis.fetch
+}
 
 const consoleIo: CliIo = {
   stdout: (line) => console.log(line),
@@ -492,11 +514,142 @@ async function bench(args: readonly string[], io: CliIo, runner: BenchRunner): P
   return 0
 }
 
+async function init(args: readonly string[], io: CliIo): Promise<number> {
+  const parsed = parseFlags(args, { template: 'string', id: 'string', force: 'boolean' })
+  if (!parsed.ok) {
+    io.stderr(parsed.message)
+    return 2
+  }
+  const [directory = '.'] = parsed.positionals
+  if (parsed.positionals.length > 1) {
+    io.stderr('init takes at most one directory')
+    return 2
+  }
+
+  const template = (stringFlag(parsed.flags, 'template') ?? 'books') as TemplateName
+  if (!TEMPLATE_NAMES.includes(template)) {
+    io.stderr(`Unknown template: ${template}. Choose one of ${TEMPLATE_NAMES.join(', ')}.`)
+    return 2
+  }
+
+  const id = stringFlag(parsed.flags, 'id')
+  const result = await initDeck({
+    directory,
+    template,
+    ...(id === undefined ? {} : { id }),
+    ...(parsed.flags.force === true ? { force: true } : {}),
+  })
+  if (!result.created) {
+    io.stderr(`${result.path} already exists; pass --force to replace it.`)
+    return 1
+  }
+
+  io.stdout(`Wrote ${result.path} (${template} template, deck id ${result.manifest.id}).`)
+  io.stdout(`Framework detected: ${result.framework}.`)
+  io.stdout(`Preview it: swipeline dev --config ${result.path}`)
+  io.stdout(frameworkHint(result.framework))
+  return 0
+}
+
+async function sourceAdd(args: readonly string[], io: CliIo, deps: CliDeps): Promise<number> {
+  const parsed = parseFlags(args, { id: 'string', config: 'string', deck: 'string' })
+  if (!parsed.ok) {
+    io.stderr(parsed.message)
+    return 2
+  }
+  const [url] = parsed.positionals
+  if (url === undefined || parsed.positionals.length > 1) {
+    io.stderr('source add needs exactly one URL')
+    return 2
+  }
+
+  const id = stringFlag(parsed.flags, 'id')
+  const deckId = stringFlag(parsed.flags, 'deck')
+  let result: Awaited<ReturnType<typeof addSource>>
+  try {
+    result = await addSource({
+      url,
+      configPath: stringFlag(parsed.flags, 'config') ?? CONFIG_FILE,
+      ...(id === undefined ? {} : { id }),
+      ...(deckId === undefined ? {} : { deckId }),
+      ...(deps.fetch === undefined ? {} : { fetch: deps.fetch }),
+    })
+  } catch (cause) {
+    io.stderr(`Could not map ${url}: ${messageOf(cause)}`)
+    return 1
+  }
+
+  io.stdout(`Wrote ${result.path}.`)
+  const items = result.source.itemsPath ?? '(the response)'
+  io.stdout(`source: ${result.source.id}, itemsPath: ${items}`)
+  io.stdout(`map: ${JSON.stringify(result.source.map)}`)
+  for (const card of result.cards) {
+    io.stdout(`  preview: ${card.title}${card.subtitle ? ` — ${card.subtitle}` : ''}`)
+  }
+  if (result.dropped > 0) io.stderr(`${result.dropped} sample row(s) did not map to a card.`)
+  return 0
+}
+
+async function dev(args: readonly string[], io: CliIo, deps: CliDeps): Promise<number> {
+  const parsed = parseFlags(args, {
+    config: 'string',
+    port: 'integer',
+    db: 'string',
+    actor: 'string',
+  })
+  if (!parsed.ok) {
+    io.stderr(parsed.message)
+    return 2
+  }
+  const [extra] = parsed.positionals
+  if (extra !== undefined) {
+    io.stderr(`Unexpected argument: ${extra}`)
+    return 2
+  }
+
+  const configPath = stringFlag(parsed.flags, 'config') ?? CONFIG_FILE
+  let manifest: Awaited<ReturnType<typeof loadManifest>>
+  try {
+    manifest = await loadManifest(configPath)
+  } catch (cause) {
+    io.stderr(`Could not read ${configPath}: ${messageOf(cause)}. Run swipeline init first.`)
+    return 1
+  }
+
+  const db = stringFlag(parsed.flags, 'db') ?? '.swipeline/dev.db'
+  await mkdir(dirname(db), { recursive: true })
+  const stores = createSqliteStores({ path: db })
+  const port = numberFlag(parsed.flags, 'port')
+  const actor = stringFlag(parsed.flags, 'actor')
+
+  try {
+    const running = await createDevServer({
+      manifest,
+      stores,
+      ...(port === undefined ? {} : { port }),
+      ...(actor === undefined ? {} : { actor }),
+      ...(deps.fetch === undefined ? {} : { fetch: deps.fetch }),
+    })
+    io.stdout(`swipeline dev listening on ${running.url}`)
+    io.stdout(`Loaded ${running.cards.length} card(s) from ${manifest.source.id}.`)
+    io.stdout(`Swipes are appended to ${db}; Ctrl-C stops the server.`)
+    await waitForSignal()
+    await running.close()
+    io.stdout('Stopped.')
+    return 0
+  } catch (cause) {
+    io.stderr(messageOf(cause))
+    return 1
+  } finally {
+    stores.close()
+  }
+}
+
 /** Entry point for tests and for the `swipeline` bin. Returns the exit code. */
 export async function run(
   argv: readonly string[],
   io: CliIo = consoleIo,
-  benchmark: BenchRunner = runBenchmark,
+  deps: CliDeps = {},
 ): Promise<number> {
   const [command, ...rest] = argv
 
@@ -505,12 +658,22 @@ export async function run(
     return 0
   }
 
+  if (command === 'init') return init(rest, io)
+  if (command === 'source') {
+    const [subcommand, ...args] = rest
+    if (subcommand !== 'add') {
+      io.stderr(`Unknown source command: ${subcommand ?? ''}. Try: swipeline source add <url>`)
+      return 2
+    }
+    return sourceAdd(args, io, deps)
+  }
+  if (command === 'dev') return dev(rest, io, deps)
   if (command === 'serve') return serve(rest, io)
   if (command === 'validate') return validate(rest, io)
   if (command === 'export') return exportHistory(rest, io)
   if (command === 'import') return importHistory(rest, io)
   if (command === 'doctor') return doctor(rest, io)
-  if (command === 'bench') return bench(rest, io, benchmark)
+  if (command === 'bench') return bench(rest, io, deps.benchmark ?? runBenchmark)
 
   io.stderr(`Unknown command: ${command}`)
   io.stderr(USAGE)

@@ -3,7 +3,8 @@
   "compilerOptions": {
     "types": ["node"],
     "paths": {
-      "@swipeline/core": ["../../packages/core/src/index.ts"]
+      "@swipeline/core": ["../../packages/core/src/index.ts"],
+      "@swipeline/rank": ["../../packages/rank/src/index.ts"]
     }
   },
   "include": ["src/**/*.ts", "test/**/*.ts"]

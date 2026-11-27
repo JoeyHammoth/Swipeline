@@ -23,9 +23,11 @@ Declarative HTTP/JSON source adapter for Swipeline: mapping, pagination, retries
 | --- | --- | --- |
 | `createHttpJsonAdapter` | function | One adapter for any REST/JSON source: a URL, an items path, a field map and a |
 | `FieldMap` | interface |  |
+| `httpJson` | const | The documented name for `createHttpJsonAdapter`; used in deck configs. |
 | `HttpJsonAdapter` | interface |  |
 | `HttpJsonAdapterConfig` | interface |  |
 | `HttpJsonError` | class |  |
+| `httpJsonSourceConfig` | function | Turns a deck manifest's `source` block into an adapter config. Manifest keys |
 | `HttpJsonStats` | interface |  |
 | `PaginationConfig` | interface |  |
 | `PaginationMode` | type |  |
@@ -103,6 +105,7 @@ The swipeline command: serve the HTTP API, validate, export and import a history
 | Symbol | Kind | Summary |
 | --- | --- | --- |
 | `BenchRunner` | type | Runs the benchmark. Injected in tests so `swipeline bench` is not slow. |
+| `CliDeps` | interface | Everything the commands reach outside the process, so tests can replace it. |
 | `CliIo` | interface |  |
 | `HistoryValidation` | interface |  |
 | `parseServeOptions` | function |  |
@@ -129,11 +132,16 @@ Schemas, types, config and the headless deck engine for Swipeline.
 | `createUlid` | function | Crockford base32 ULID: 48 bits of timestamp followed by 80 random bits. |
 | `DeckCommand` | type |  |
 | `DeckError` | interface |  |
+| `DeckManifest` | type |  |
+| `deckManifestSchema` | const |  |
+| `DeckManifestSource` | type |  |
+| `deckManifestSourceSchema` | const | A deck can be described as data instead of code: `*.deck.json` holds the |
 | `DeckSnapshot` | interface | Immutable view of the deck. The same object is returned until something |
 | `DeckState` | type | States from the design plan (§5.7). `loading`, `committing` and `ready` are |
 | `DeckStore` | interface |  |
 | `DEFAULT_ACTION_WEIGHTS` | const | Starting weights from the design plan (§5.5). Tuned by the benchmark, not by |
 | `DEFAULT_ACTIONS` | const |  |
+| `defineDeck` | function | Identity helper for a manifest written in TypeScript, validated at startup. |
 | `Engine` | interface | `createEngine` returns a store plus two helpers that are not part of the |
 | `EngineConfig` | interface |  |
 | `EventQuery` | interface | Filters for event queries. All fields are optional and combine with AND. |
@@ -148,6 +156,7 @@ Schemas, types, config and the headless deck engine for Swipeline.
 | `MemoryEventStore` | class | The default log. Small, append-only and idempotent by event id. |
 | `parseCard` | function | Parses untrusted data into a Card, throwing a ZodError on failure. |
 | `parseCardId` | function | Splits a card id back into its source and external parts. |
+| `parseDeckManifest` | function | Parses untrusted JSON into a manifest, throwing a `ZodError` on failure. Every |
 | `parseSwipeEvent` | function | Parses untrusted data into a SwipeEvent, throwing a ZodError on failure. |
 | `Profile` | type |  |
 | `profileSchema` | const |  |
@@ -165,6 +174,20 @@ Schemas, types, config and the headless deck engine for Swipeline.
 | `TagPosterior` | type |  |
 | `tagPosteriorSchema` | const | Beta posterior per tag: `a` counts positive evidence, `b` negative. |
 | `ULID_PATTERN` | const | Crockford base32 ULID: 26 characters, no I, L, O or U, so ids sort by time |
+
+## `create-swipeline`
+
+Scaffold a Swipeline deck: blank, books, papers, recipes or products.
+
+| Symbol | Kind | Summary |
+| --- | --- | --- |
+| `deck` | const |  |
+| `ScaffoldOptions` | interface |  |
+| `ScaffoldResult` | interface |  |
+| `TEMPLATE_NAMES` | const |  |
+| `TemplateName` | type |  |
+| `TEMPLATES` | const |  |
+| `TemplateSummary` | interface |  |
 
 ## `@swipeline/element`
 

@@ -37,6 +37,12 @@ export default defineConfig({
   test: {
     include: ['packages/*/test/**/*.test.{ts,tsx}'],
     environment: 'node',
+    // One file per worker puts 30+ processes on a two-core runner, and the
+    // Postgres conformance suite runs a WASM Postgres inside one of them. The
+    // default 5s is a CPU-contention limit rather than a real hang, so it is
+    // raised instead of splitting the suite into a second job.
+    testTimeout: 20_000,
+    hookTimeout: 20_000,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov'],
