@@ -31,9 +31,13 @@ xcodebuild \
   CODE_SIGNING_ALLOWED=NO \
   build
 
-APP=$(find ios/build/Build/Products/Release-iphonesimulator -maxdepth 1 -name '*.app' | head -1)
-if [ -z "$APP" ]; then
-  echo "::error::xcodebuild produced no .app"
+# BSD find on macOS has no `-maxdepth`, so search the products tree by name.
+# `sed -n 1p` rather than `head -1`: head closes the pipe and `pipefail` would
+# turn that into a failure.
+APP=$(find ios/build/Build/Products -type d -name '*.app' 2>/dev/null | sed -n 1p)
+if [ -z "$APP" ] || [ ! -d "$APP" ]; then
+  echo "::error::xcodebuild produced no .app under ios/build/Build/Products"
+  ls -R ios/build/Build/Products | sed -n 1,40p
   exit 1
 fi
 echo "App: $APP"
