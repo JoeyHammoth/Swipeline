@@ -94,6 +94,7 @@ export default defineConfig({
           { text: 'Strings and locales', link: '/reference/i18n' },
           { text: 'API reference', link: '/reference/api' },
           { text: 'Binding status', link: '/reference/binding-status' },
+          { text: 'Accessibility audit', link: '/reference/a11y-audit' },
           { text: 'Contracts', link: '/architecture/contracts' },
         ],
       },

@@ -100,7 +100,14 @@ The binding typechecks against React Native 0.88 and its render tests run with
 snapshot, one control per action, undo, the exhausted state, the announcement
 call and teardown. The decision math has its own unit tests.
 
-It has **not** run on a device, simulator or emulator: that needs hardware this
-repository's CI does not have, and the Expo demo app is not written yet. Treat
-the native half as unverified until that run exists. See
-[Binding status](/reference/binding-status).
+`examples/books-expo` is the smoke app: it mounts the deck from a fixed offline
+source, runs a scripted swipe on launch (refill, like the first card, advance,
+confirm the like reached the event log) and prints the result on screen. That
+script is unit-tested in Node, and `pnpm examples:build` bundles the app for iOS
+and Android with `expo export`, so the app is known to compile for both platforms.
+
+It has **not** been launched on a device, simulator or emulator, so layout, real
+touch input and platform announcements are still unverified. Treat the native
+half as unconfirmed until that run exists. See
+[Binding status](/reference/binding-status) and the
+[accessibility audit](/reference/a11y-audit).

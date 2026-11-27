@@ -65,6 +65,9 @@ The binding typechecks against `react-native` 0.88 and is tested with
 snapshot, one control per action, undo, the exhausted state, the announcement
 call and teardown. The gesture decision math is covered separately by unit tests.
 
-It has **not** been run on a device, simulator or emulator, and there is no Expo
-example app yet, so the native half of the binding is unverified here. See
+`examples/books-expo` mounts the deck, runs a scripted swipe (refill, like,
+advance, confirm the event was logged) and prints the result; `pnpm examples:build`
+bundles it for iOS and Android with `expo export`. It has **not** been run on a
+device, simulator or emulator, so real touch input, layout and platform
+announcements are unverified here. See
 [Binding status](https://github.com/JoeyHammoth/Swipeline/blob/main/docs/reference/binding-status.md).

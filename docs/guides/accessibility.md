@@ -16,7 +16,7 @@ part of a binding's definition of done, not a later audit.
 | Card changes are announced | ARIA live region with title and position | Conformance suite |
 | Focus is managed on advance | Focus stays in the action group, not lost to `body` | Component tests |
 | Reduced motion is honoured | `prefers-reduced-motion` switches to a fade, durations go to 0 | Conformance suite |
-| Contrast is sufficient | Default theme meets WCAG AA; tokens documented | axe (WCAG A/AA) on the binding fixtures in `e2e.yml` |
+| Contrast is sufficient | Default theme meets WCAG AA; tokens documented | axe (WCAG 2.0/2.1/2.2, levels A and AA) on the binding fixtures in `e2e.yml` |
 | Custom cards keep access | Templates cannot remove the action controls | Review checklist |
 
 ## Keyboard map (default)
@@ -60,11 +60,17 @@ screen. The overlay labels appear without scaling.
 
 ## Testing it
 
-- `axe` runs with the `wcag2a` and `wcag2aa` tags against the two binding fixture pages in the `e2e` workflow. The example apps are not scanned yet.
+- `axe` runs with the `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa` and `wcag22aa`
+  tags against the four binding fixture pages in the `e2e` workflow. The example
+  apps are not scanned yet.
 - The binding conformance suite includes a keyboard-only path and a
   reduced-motion path.
-- Manual checks before a release: VoiceOver on macOS/iOS, NVDA on Windows, and a
-  keyboard-only run with the pointer physically disconnected.
+- Manual checks before a release: VoiceOver on macOS/iOS, TalkBack on Android,
+  NVDA on Windows, and a keyboard-only run with the pointer physically
+  disconnected.
+
+The results of each run, and the open manual checklist, are on the
+[accessibility audit page](/reference/a11y-audit).
 
 ## Reporting a barrier
 

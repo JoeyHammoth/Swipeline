@@ -50,7 +50,7 @@ Useful scripts:
 | `pnpm build` | Build every package with tsup |
 | `pnpm publint` | Validate `exports`, types and dual-format builds |
 | `pnpm check:boundaries` | Fail on framework dependencies outside bindings |
-| `pnpm licenses:check` | Dependency license policy |
+| `pnpm licenses:check` | Dependency license policy, for the published packages |
 | `pnpm package:licenses` | Published packages carry `LICENSE` and `NOTICE` |
 | `pnpm e2e` | Binding conformance in Chromium (see below) |
 | `pnpm docs:dev` / `pnpm docs:build` | VitePress site |

@@ -54,7 +54,9 @@ export default defineConfig({
     ],
   },
   test: {
-    include: ['packages/*/test/**/*.test.{ts,tsx}'],
+    // The Expo example keeps its scripted-swipe smoke test with the app, because
+    // it imports the app's own deck; it runs in Node without React Native.
+    include: ['packages/*/test/**/*.test.{ts,tsx}', 'examples/*/test/**/*.test.{ts,tsx}'],
     environment: 'node',
     // One file per worker puts 30+ processes on a two-core runner, and the
     // Postgres conformance suite runs a WASM Postgres inside one of them. The

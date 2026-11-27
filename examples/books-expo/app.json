@@ -1,0 +1,13 @@
+{
+  "expo": {
+    "name": "Swipeline books",
+    "slug": "swipeline-books-expo",
+    "version": "0.0.0",
+    "orientation": "portrait",
+    "platforms": ["ios", "android"],
+    "newArchEnabled": true,
+    "experiments": {
+      "tsconfigPaths": false
+    }
+  }
+}

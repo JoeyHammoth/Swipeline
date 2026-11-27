@@ -6,6 +6,10 @@
  * evaluation, commercial license required for production" variants that some
  * SQLite extensions use.
  *
+ * Scoped to publishable workspace packages: the private example apps are not
+ * distributed, and their native toolchain (Expo/Metro) carries MPL and
+ * dual-licensed packages that never reach a tarball.
+ *
  * Usage: pnpm licenses:check
  */
 import { execFileSync } from 'node:child_process'
@@ -29,10 +33,14 @@ const BLOCKED_HINTS = ['GPL', 'AGPL', 'SSPL', 'BUSL', 'Commons Clause', 'UNLICEN
 let raw
 try {
   // Recursive so workspace packages' production dependencies are included.
-  raw = execFileSync('pnpm', ['-r', 'licenses', 'list', '--prod', '--json'], {
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'pipe'],
-  })
+  raw = execFileSync(
+    'pnpm',
+    ['-r', '--filter', './packages/**', 'licenses', 'list', '--prod', '--json'],
+    {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+    },
+  )
 } catch (error) {
   console.error('Could not read the production dependency tree. Run `pnpm install` first.')
   console.error(String(error.stderr ?? error).slice(0, 500))
@@ -68,4 +76,6 @@ if (violations.length > 0) {
   process.exit(1)
 }
 
-console.log(`License policy passed: ${count} production dependenc${count === 1 ? 'y' : 'ies'}.`)
+console.log(
+  `License policy passed: ${count} production dependenc${count === 1 ? 'y' : 'ies'} in published packages.`,
+)

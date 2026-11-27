@@ -1,0 +1,27 @@
+{
+  "name": "swipeline-example-books-expo",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Expo smoke app: the React Native binding on iOS and Android, with a scripted swipe.",
+  "scripts": {
+    "dev": "expo start",
+    "build": "expo export --platform ios --platform android --output-dir dist",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@swipeline/core": "workspace:*",
+    "@swipeline/react-native": "workspace:*",
+    "@swipeline/store-memory": "workspace:*",
+    "expo": "~58.1.0",
+    "react": "19.3.0",
+    "react-native": "0.88.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.3.0",
+    "typescript": "^7.0.2"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

@@ -28,7 +28,12 @@ for (const name of FIXTURES) {
     expect(pageErrors).toEqual([])
     expect(report).toEqual({ binding: name, checks: 7 })
 
-    const accessibility = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze()
+    // WCAG 2.0, 2.1 and 2.2 at levels A and AA. The newer rule sets are what
+    // catch focus-not-obscured, dragging alternatives and target size, which the
+    // 2.0 tags alone do not include.
+    const accessibility = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
+      .analyze()
     expect(
       accessibility.violations.map((violation) => ({
         id: violation.id,

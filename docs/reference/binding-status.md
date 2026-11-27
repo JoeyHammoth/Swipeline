@@ -42,8 +42,9 @@ lockfile, plus nightly and on demand. The jsdom suites run in `ci.yml` on every 
 - **React Native.** The binding has no jsdom or browser suite: React Native is
   Flow source that Node cannot load, so its render tests run against a mocked
   `react-native` module, and the drag itself is covered only through
-  `intentFromGesture` unit tests. Nothing in this repository has run the deck on
-  iOS or Android, and there is no Expo example app yet.
+  `intentFromGesture` unit tests. `examples/books-expo` bundles for iOS and
+  Android and its scripted swipe is unit-tested, but nothing in this repository
+  has launched it on a device, simulator or emulator.
 
 ## Adding a row
 
