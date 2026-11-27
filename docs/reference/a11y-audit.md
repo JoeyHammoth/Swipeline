@@ -62,15 +62,18 @@ regress the record.
 |---|---|---|
 | `color-fg` on `color-bg` | 17.74:1 (AAA) | 17.14:1 (AAA) |
 | `color-muted` on `color-bg` | 7.56:1 (AAA) | 12.08:1 (AAA) |
-| `color-accent` on `color-bg` | 5.17:1 (AA) | 7.05:1 (AAA) |
-| `color-border` on `color-bg` | 1.24:1 | 1.73:1 |
+| `color-accent` on `color-bg` | 8.72:1 (AAA) | 7.05:1 (AAA) |
+| `color-border` on `color-bg` | 3.24:1 | 3.77:1 |
 
-Shortfalls: **light `color-accent` is 5.17:1, under the 7:1 AAA text target**
-(AA passes), and **`color-border` is below the 3:1 non-text boundary minimum in
-both palettes**. The border is decoration around an already-labelled control;
-neither the accent nor the border is changed here, because both would repaint
-the default look. Anyone shipping on a coloured or photographic surface should
-treat `color-border` as needing a local override.
+Every text pair clears AAA, and both boundary pairs clear the 3:1 minimum. Two
+values changed to get there: light `color-accent` went `#2563eb → #1e40af`
+(5.17:1 → 8.72:1) and the borders went `#e5e7eb → #8a8f9b` and
+`#334155 → #64748b` (1.24:1 and 1.73:1 → 3.24:1 and 3.77:1). That is a visible
+change — a mid-grey hairline and a deeper link blue — accepted because a border
+below 3:1 is not a boundary a low-vision user can see. A theme that overrides
+these tokens takes over the obligation: the audit only measures the defaults.
+`examples/recipes-react` had the same problem on its dark page and moved its own
+border from `#3a3d63` to `#6f74a8` (1.60:1 → 3.73:1).
 
 ## What this audit found
 
@@ -123,9 +126,9 @@ Each item is unverified until someone with the tool records the result here.
 
 ## Known gaps
 
-- **AAA.** No AAA axe rules are run (contrast 7:1, sign language, extended
-  audio). The token contrast is measured directly instead — see
-  [Token contrast](#token-contrast) — and light `color-accent` misses 7:1.
+- **AAA.** No AAA axe rules are run (sign language, extended audio). Text
+  contrast is measured directly against the AAA threshold instead — see
+  [Token contrast](#token-contrast) — but a themed palette is not measured.
 - **The native deck is not scanned.** `android.yml` shows that the React Native
   deck launches and swipes on an Android emulator; no axe-equivalent check runs
   against it, and iOS has not been run.

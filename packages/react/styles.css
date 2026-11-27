@@ -2,7 +2,7 @@
 .swl-preview {
   background: var(--swl-color-bg, #fff);
   color: var(--swl-color-fg, #111827);
-  border: 1px solid var(--swl-color-border, #e5e7eb);
+  border: 1px solid var(--swl-color-border, #8a8f9b);
   border-radius: var(--swl-radius-card, 16px);
   padding: var(--swl-space-4, 16px);
 }
@@ -29,7 +29,7 @@
 
 .swl-card__tags li {
   background: var(--swl-color-bg, #fff);
-  border: 1px solid var(--swl-color-border, #e5e7eb);
+  border: 1px solid var(--swl-color-border, #8a8f9b);
   border-radius: var(--swl-radius-control, 999px);
   padding: var(--swl-space-1, 4px) var(--swl-space-2, 8px);
   font-size: 0.75rem;
@@ -45,7 +45,7 @@
 .swl-actions button {
   background: var(--swl-color-bg, #fff);
   color: var(--swl-color-fg, #111827);
-  border: 1px solid var(--swl-color-border, #e5e7eb);
+  border: 1px solid var(--swl-color-border, #8a8f9b);
   border-radius: var(--swl-radius-control, 999px);
   padding: var(--swl-space-2, 8px) var(--swl-space-4, 16px);
   cursor: pointer;
@@ -53,13 +53,13 @@
 }
 
 .swl-actions button[data-action="like"] {
-  border-color: var(--swl-color-accent, #2563eb);
-  color: var(--swl-color-accent, #2563eb);
+  border-color: var(--swl-color-accent, #1e40af);
+  color: var(--swl-color-accent, #1e40af);
 }
 
 .swl-actions button:focus-visible,
 .swl-card:focus-visible {
-  outline: 2px solid var(--swl-color-accent, #2563eb);
+  outline: 2px solid var(--swl-color-accent, #1e40af);
   outline-offset: 2px;
 }
 

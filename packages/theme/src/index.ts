@@ -30,8 +30,10 @@ export const lightTheme: Theme = Object.freeze({
   'color-bg': '#ffffff',
   'color-fg': '#111827',
   'color-muted': '#4b5563',
-  'color-border': '#e5e7eb',
-  'color-accent': '#2563eb',
+  // 3.24:1 against the background, so a control outline is visible (WCAG 1.4.11).
+  'color-border': '#8a8f9b',
+  // 8.72:1, clearing AAA for text as well as the 3:1 boundary minimum.
+  'color-accent': '#1e40af',
   'radius-card': '16px',
   'radius-control': '999px',
   'space-1': '4px',
@@ -48,7 +50,7 @@ export const darkTheme: Theme = Object.freeze({
   'color-bg': '#141625',
   'color-fg': '#f8fafc',
   'color-muted': '#cbd5e1',
-  'color-border': '#334155',
+  'color-border': '#64748b',
   'color-accent': '#60a5fa',
   'radius-card': '16px',
   'radius-control': '999px',

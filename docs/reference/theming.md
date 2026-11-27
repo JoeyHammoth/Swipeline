@@ -33,8 +33,8 @@ The package is inert: importing it touches no DOM and no globals.
 | `--swl-color-bg` | Card surface | `#ffffff` | `#141625` |
 | `--swl-color-fg` | Primary text | `#111827` | `#f8fafc` |
 | `--swl-color-muted` | Secondary text | `#4b5563` | `#cbd5e1` |
-| `--swl-color-border` | Card and control borders | `#e5e7eb` | `#334155` |
-| `--swl-color-accent` | Focus and the primary action | `#2563eb` | `#60a5fa` |
+| `--swl-color-border` | Card and control borders | `#8a8f9b` | `#64748b` |
+| `--swl-color-accent` | Focus and the primary action | `#1e40af` | `#60a5fa` |
 | `--swl-radius-card` | Card corners | `16px` | `16px` |
 | `--swl-radius-control` | Buttons and pills | `999px` | `999px` |
 | `--swl-space-1` | Tightest spacing | `4px` | `4px` |

@@ -16,7 +16,7 @@
   min-width: 44px;
   min-height: 44px;
   padding: 8px 16px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #8a8f9b;
   border-radius: 999px;
   background: #ffffff;
   color: #111827;
@@ -26,7 +26,7 @@
 
 .swl-actions button:focus-visible,
 .swl-card:focus-visible {
-  outline: 2px solid #2563eb;
+  outline: 2px solid #1e40af;
   outline-offset: 2px;
 }
 

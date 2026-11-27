@@ -54,7 +54,16 @@ const STYLES = `
   .swl-title { margin: 0 0 0.25rem; font-size: 1.25rem; }
   .swl-subtitle { margin: 0 0 0.5rem; color: var(${tokenNameFor('muted')}, ${lightTheme['color-muted']}); }
   .swl-tags { display: flex; gap: var(--swl-space-1, ${lightTheme['space-1']}); flex-wrap: wrap; padding: 0; list-style: none; }
-  .swl-tags li { background: #f3f4f6; border-radius: var(--swl-radius-control, ${lightTheme['radius-control']}); padding: 0.1rem var(--swl-space-2, ${lightTheme['space-2']}); font-size: 0.75rem; }
+  /* The pill outline, not a fixed light grey: the old background left the tag
+     text at inherited dark-page colour on near-white. */
+  .swl-tags li {
+    background: var(${tokenNameFor('bg')}, ${lightTheme['color-bg']});
+    color: var(${tokenNameFor('muted')}, ${lightTheme['color-muted']});
+    border: 1px solid var(${tokenNameFor('border')}, ${lightTheme['color-border']});
+    border-radius: var(--swl-radius-control, ${lightTheme['radius-control']});
+    padding: 0.1rem var(--swl-space-2, ${lightTheme['space-2']});
+    font-size: 0.75rem;
+  }
   .swl-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr)); gap: var(--swl-space-3, ${lightTheme['space-3']}); margin: var(--swl-space-3, ${lightTheme['space-3']}) 0 0; }
   .swl-facts dt { font-size: 0.75rem; color: var(${tokenNameFor('muted')}, ${lightTheme['color-muted']}); }
   .swl-facts dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }

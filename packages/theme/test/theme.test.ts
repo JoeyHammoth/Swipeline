@@ -27,7 +27,7 @@ describe('theme', () => {
 
   it('maps a token to its custom property and a safe var() fallback', () => {
     expect(cssVar('color-accent')).toBe('--swl-color-accent')
-    expect(tokenValue('color-accent')).toBe('var(--swl-color-accent, #2563eb)')
+    expect(tokenValue('color-accent')).toBe('var(--swl-color-accent, #1e40af)')
     expect(tokenValue('color-accent', darkTheme)).toBe('var(--swl-color-accent, #60a5fa)')
   })
 
@@ -35,7 +35,7 @@ describe('theme', () => {
     const brand = mergeTheme(lightTheme, { 'color-accent': '#db2777' })
     expect(brand['color-accent']).toBe('#db2777')
     expect(brand['color-bg']).toBe(lightTheme['color-bg'])
-    expect(lightTheme['color-accent']).toBe('#2563eb')
+    expect(lightTheme['color-accent']).toBe('#1e40af')
     expect(Object.isFrozen(brand)).toBe(true)
   })
 

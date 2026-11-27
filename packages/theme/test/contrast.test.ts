@@ -49,41 +49,49 @@ function textRatios() {
 }
 
 function boundaryRatios() {
-  return PALETTES.flatMap(({ name, theme }) => [
-    { name: `${name} color-border`, ratio: contrast(theme['color-border'], theme['color-bg']) },
-    { name: `${name} color-accent`, ratio: contrast(theme['color-accent'], theme['color-bg']) },
-  ])
+  return PALETTES.flatMap(({ name, theme }) =>
+    (['color-border', 'color-accent'] as const).map((token) => ({
+      name: `${name} ${token}`,
+      ratio: contrast(theme[token], theme['color-bg']),
+    })),
+  )
 }
 
 describe('default theme contrast', () => {
-  it('passes AA for every text pair in both palettes', () => {
+  it('passes AAA for every text pair in both palettes', () => {
     const failures = textRatios()
-      .filter((pair) => pair.ratio < AA_TEXT)
+      .filter((pair) => pair.ratio < AAA_TEXT)
       .map((pair) => `${pair.name} (${pair.label}) is ${pair.ratio.toFixed(2)}:1`)
     expect(failures).toEqual([])
   })
 
-  it('passes 3:1 for the accent boundary in both palettes', () => {
-    const accent = boundaryRatios().filter((pair) => pair.name.endsWith('color-accent'))
-    for (const pair of accent) expect(pair.ratio).toBeGreaterThanOrEqual(NON_TEXT)
+  it('clears AA with room to spare, so a small palette tweak does not drop below it', () => {
+    for (const pair of textRatios()) expect(pair.ratio).toBeGreaterThanOrEqual(AA_TEXT)
   })
 
-  // The two tests below pin the audit record in docs/reference/a11y-audit.md: if a
-  // palette changes, they fail and the record has to be updated with it.
-  it('records which text pairs miss AAA', () => {
-    expect(
-      textRatios()
-        .filter((pair) => pair.ratio < AAA_TEXT)
-        .map((pair) => `${pair.name} ${pair.ratio.toFixed(2)}`),
-    ).toEqual(['light color-accent 5.17'])
+  it('passes 3:1 for every boundary in both palettes', () => {
+    const failures = boundaryRatios()
+      .filter((pair) => pair.ratio < NON_TEXT)
+      .map((pair) => `${pair.name} is ${pair.ratio.toFixed(2)}:1`)
+    expect(failures).toEqual([])
   })
 
-  it('records which boundaries miss 3:1', () => {
-    expect(
-      boundaryRatios()
-        .filter((pair) => pair.name.endsWith('color-border'))
-        .filter((pair) => pair.ratio < NON_TEXT)
-        .map((pair) => `${pair.name} ${pair.ratio.toFixed(2)}`),
-    ).toEqual(['light color-border 1.24', 'dark color-border 1.73'])
+  // Pins the table in docs/reference/a11y-audit.md: a palette change fails here,
+  // and the record has to be updated with it rather than drifting.
+  it('records the audited ratios', () => {
+    expect(textRatios().map((pair) => `${pair.name} ${pair.ratio.toFixed(2)}`)).toEqual([
+      'light color-fg 17.74',
+      'light color-muted 7.56',
+      'light color-accent 8.72',
+      'dark color-fg 17.14',
+      'dark color-muted 12.08',
+      'dark color-accent 7.05',
+    ])
+    expect(boundaryRatios().map((pair) => `${pair.name} ${pair.ratio.toFixed(2)}`)).toEqual([
+      'light color-border 3.24',
+      'light color-accent 8.72',
+      'dark color-border 3.77',
+      'dark color-accent 7.05',
+    ])
   })
 })
