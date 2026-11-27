@@ -56,13 +56,19 @@ deck, no framework imports outside binding packages, playground v0 live.
 ## M3 — v0.3: server and CLI
 
 - [x] `server` core: `GET /health`, validated idempotent `POST /events`, `GET /export/:actor`, `DELETE /actors/:actor`, auth hook and CORS
-- [ ] `server` storage: SQLite + Postgres, `remote` store with outbox sync
-- [ ] `sinks`: signed webhook, JSONL
+- [x] `server` storage: SQLite (`store-sqlite`, `node:sqlite`) and Postgres
+  (`store-postgres`, any `pg` client), plus `store-remote` with outbox sync
+- [x] `sinks`: signed webhook (HMAC-SHA256, replay window) and JSONL
 - [x] `cli`: `serve`, `validate`, help and exit codes 0/1/2
-- [ ] `cli`: init, source add, dev, bench, export/import, doctor
+- [x] `cli`: bench, export, import, doctor
+- [ ] `cli`: init, source add, dev
 - [ ] `create-swipeline` templates; trusted publishing wired up
 - Acceptance: offline-then-online sync passes; webhook delivery is idempotent;
   scaffold-and-build nightly job is green
+- Offline-then-online sync is covered by `store-remote` tests against a real
+  in-process server, and webhook idempotency by `sinks` tests that repeat a
+  batch and compare the delivery id. The scaffold-and-build nightly job waits on
+  `create-swipeline` and `swipeline init`.
 
 ## M4 — v0.5: mobile and breadth
 

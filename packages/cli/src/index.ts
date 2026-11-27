@@ -1,18 +1,36 @@
-import { readFile } from 'node:fs/promises'
-import { MemoryEventStore, parseSwipeEvent, type SwipeEvent } from '@swipeline/core'
+import { constants, existsSync } from 'node:fs'
+import { access, readFile, writeFile } from 'node:fs/promises'
+import { dirname } from 'node:path'
+import type { BenchReport, StrategyName } from '@swipeline/bench'
+import { runBenchmark } from '@swipeline/bench'
+import {
+  type EventQuery,
+  MemoryEventStore,
+  parseSwipeEvent,
+  type SwipeEvent,
+} from '@swipeline/core'
 import { createServer } from '@swipeline/server'
+import { createSqliteStores } from '@swipeline/store-sqlite'
 
 export const USAGE = `swipeline - decks from any source, ranked locally
 
 Usage:
-  swipeline serve [--port <port>] [--host <host>] [--cors <origin>]...
+  swipeline serve [--port <port>] [--host <host>] [--cors <origin>]... [--db <file>]
   swipeline validate <history.jsonl>
+  swipeline export <swipes.db> [--actor <id>] [--deck <id>] [--since <iso>] [--until <iso>] [--after <ulid>] [--limit <n>] [--out <file>]
+  swipeline import <swipes.db> <history.jsonl>
+  swipeline doctor [--db <file>]
+  swipeline bench [--seed <n>] [--users <n>] [--cards <n>] [--k <n>] [--gate]
   swipeline help
 
-serve     Start the HTTP API with an in-memory event log.
+serve     Run the HTTP API, optionally backed by a SQLite file.
 validate  Check a JSONL history export against the SwipeEvent schema.
+export    Write a stored history as JSONL.
+import    Append a JSONL history to a SQLite database.
+doctor    Report the runtime and storage state this CLI will use.
+bench     Run the synthetic-user benchmark against the default pipeline.
 
-Exit codes: 0 success, 1 validation failed, 2 bad usage.
+Exit codes: 0 success, 1 failure, 2 bad usage, 3 benchmark regression.
 `
 
 export interface CliIo {
@@ -24,6 +42,8 @@ export interface ServeOptions {
   port: number
   host: string
   cors: string[]
+  /** SQLite file to persist the event log. Absent means memory-only. */
+  db?: string
 }
 
 export type ServeParse = { ok: true; options: ServeOptions } | { ok: false; message: string }
@@ -33,9 +53,75 @@ export interface HistoryValidation {
   errors: { line: number; message: string }[]
 }
 
+/** Runs the benchmark. Injected in tests so `swipeline bench` is not slow. */
+export type BenchRunner = (options: {
+  seed?: number
+  users?: number
+  cards?: number
+  k?: number
+}) => Promise<BenchReport>
+
 const consoleIo: CliIo = {
   stdout: (line) => console.log(line),
   stderr: (line) => console.error(line),
+}
+
+const BASELINES: readonly StrategyName[] = ['random', 'popularity', 'tagOnly']
+const MINIMUM_NODE_MAJOR = 24
+
+type FlagKind = 'string' | 'integer' | 'strings' | 'boolean'
+type FlagValue = string | number | string[] | true
+
+interface ParsedFlags {
+  ok: true
+  flags: Record<string, FlagValue>
+  positionals: string[]
+}
+
+type FlagParse = ParsedFlags | { ok: false; message: string }
+
+function parseFlags(args: readonly string[], spec: Record<string, FlagKind>): FlagParse {
+  const flags: Record<string, FlagValue> = {}
+  const positionals: string[] = []
+
+  for (let index = 0; index < args.length; index += 1) {
+    const arg = args[index]
+    if (arg === undefined) continue
+    if (!arg.startsWith('--')) {
+      positionals.push(arg)
+      continue
+    }
+
+    const name = arg.slice(2)
+    const kind = spec[name]
+    if (!kind) return { ok: false, message: `Unknown option: ${arg}` }
+    if (kind === 'boolean') {
+      flags[name] = true
+      continue
+    }
+
+    const value = args[index + 1]
+    if (value === undefined || value.startsWith('--')) {
+      return { ok: false, message: `${arg} needs a value` }
+    }
+    index += 1
+
+    if (kind === 'strings') {
+      const current = flags[name]
+      flags[name] = Array.isArray(current) ? [...current, value] : [value]
+      continue
+    }
+
+    if (kind === 'integer') {
+      if (!/^\d+$/.test(value)) return { ok: false, message: `${arg} needs a number` }
+      flags[name] = Number(value)
+      continue
+    }
+
+    flags[name] = value
+  }
+
+  return { ok: true, flags, positionals }
 }
 
 function messageOf(cause: unknown): string {
@@ -50,39 +136,39 @@ function messageOf(cause: unknown): string {
   return cause instanceof Error ? cause.message : String(cause)
 }
 
+function stringFlag(flags: Record<string, FlagValue>, name: string): string | undefined {
+  const value = flags[name]
+  return typeof value === 'string' ? value : undefined
+}
+
+function numberFlag(flags: Record<string, FlagValue>, name: string): number | undefined {
+  const value = flags[name]
+  return typeof value === 'number' ? value : undefined
+}
+
 export function parseServeOptions(args: readonly string[]): ServeParse {
-  const options: ServeOptions = { port: 8787, host: '127.0.0.1', cors: [] }
+  const parsed = parseFlags(args, {
+    port: 'integer',
+    host: 'string',
+    cors: 'strings',
+    db: 'string',
+  })
+  if (!parsed.ok) return parsed
+  const [extra] = parsed.positionals
+  if (extra !== undefined) return { ok: false, message: `Unexpected argument: ${extra}` }
 
-  for (let index = 0; index < args.length; index += 1) {
-    const flag = args[index]
-    const value = args[index + 1]
-
-    if (flag === '--port') {
-      if (!value || !/^\d+$/.test(value)) return { ok: false, message: '--port needs a number' }
-      const port = Number(value)
-      if (port > 65_535) return { ok: false, message: '--port must be 65535 or lower' }
-      options.port = port
-      index += 1
-      continue
-    }
-
-    if (flag === '--host') {
-      if (!value) return { ok: false, message: '--host needs a value' }
-      options.host = value
-      index += 1
-      continue
-    }
-
-    if (flag === '--cors') {
-      if (!value) return { ok: false, message: '--cors needs an origin' }
-      options.cors.push(value)
-      index += 1
-      continue
-    }
-
-    return { ok: false, message: `Unknown option: ${flag ?? ''}` }
+  const port = numberFlag(parsed.flags, 'port')
+  if (port !== undefined && port > 65_535) {
+    return { ok: false, message: '--port must be 65535 or lower' }
   }
 
+  const options: ServeOptions = {
+    port: port ?? 8787,
+    host: stringFlag(parsed.flags, 'host') ?? '127.0.0.1',
+    cors: (parsed.flags.cors as string[] | undefined) ?? [],
+  }
+  const db = stringFlag(parsed.flags, 'db')
+  if (db !== undefined) options.db = db
   return { ok: true, options }
 }
 
@@ -110,6 +196,13 @@ export async function validateHistoryFile(path: string): Promise<HistoryValidati
   return { events, errors }
 }
 
+function waitForSignal(): Promise<void> {
+  return new Promise<void>((resolve) => {
+    process.once('SIGINT', () => resolve())
+    process.once('SIGTERM', () => resolve())
+  })
+}
+
 async function serve(args: readonly string[], io: CliIo): Promise<number> {
   const parsed = parseServeOptions(args)
   if (!parsed.ok) {
@@ -117,21 +210,27 @@ async function serve(args: readonly string[], io: CliIo): Promise<number> {
     return 2
   }
 
+  const stores = parsed.options.db ? createSqliteStores({ path: parsed.options.db }) : undefined
   const server = createServer({
-    events: new MemoryEventStore(),
+    events: stores?.events ?? new MemoryEventStore(),
     ...(parsed.options.cors.length > 0 ? { cors: parsed.options.cors } : {}),
   })
-  const running = await server.listen(parsed.options.port, parsed.options.host)
-  io.stdout(`swipeline server listening on ${running.url}`)
-  io.stdout('Using the in-memory event log: history is lost when this process exits.')
 
-  await new Promise<void>((resolve) => {
-    process.once('SIGINT', () => resolve())
-    process.once('SIGTERM', () => resolve())
-  })
-  await running.close()
-  io.stdout('Server stopped.')
-  return 0
+  try {
+    const running = await server.listen(parsed.options.port, parsed.options.host)
+    io.stdout(`swipeline server listening on ${running.url}`)
+    io.stdout(
+      parsed.options.db
+        ? `Using SQLite at ${parsed.options.db}: history survives a restart.`
+        : 'Using the in-memory event log: history is lost when this process exits.',
+    )
+    await waitForSignal()
+    await running.close()
+    io.stdout('Server stopped.')
+    return 0
+  } finally {
+    stores?.close()
+  }
 }
 
 async function validate(args: readonly string[], io: CliIo): Promise<number> {
@@ -159,8 +258,246 @@ async function validate(args: readonly string[], io: CliIo): Promise<number> {
   return 0
 }
 
+function exportQuery(flags: Record<string, FlagValue>): EventQuery {
+  const query: EventQuery = {}
+  const actor = stringFlag(flags, 'actor')
+  const deckId = stringFlag(flags, 'deck')
+  const since = stringFlag(flags, 'since')
+  const until = stringFlag(flags, 'until')
+  const after = stringFlag(flags, 'after')
+  const limit = numberFlag(flags, 'limit')
+  if (actor !== undefined) query.actor = actor
+  if (deckId !== undefined) query.deckId = deckId
+  if (since !== undefined) query.since = since
+  if (until !== undefined) query.until = until
+  if (after !== undefined) query.afterId = after
+  if (limit !== undefined) query.limit = limit
+  return query
+}
+
+async function exportHistory(args: readonly string[], io: CliIo): Promise<number> {
+  const parsed = parseFlags(args, {
+    actor: 'string',
+    deck: 'string',
+    since: 'string',
+    until: 'string',
+    after: 'string',
+    limit: 'integer',
+    out: 'string',
+  })
+  if (!parsed.ok) {
+    io.stderr(parsed.message)
+    return 2
+  }
+
+  const [path] = parsed.positionals
+  if (path === undefined || parsed.positionals.length > 1) {
+    io.stderr('export needs exactly one SQLite database')
+    return 2
+  }
+  if (!existsSync(path)) {
+    io.stderr(`No such database: ${path}`)
+    return 1
+  }
+
+  const stores = createSqliteStores({ path })
+  try {
+    const events = await stores.events.export(exportQuery(parsed.flags))
+    const text =
+      events.length > 0 ? `${events.map((event) => JSON.stringify(event)).join('\n')}\n` : ''
+    const out = stringFlag(parsed.flags, 'out')
+    if (out !== undefined) {
+      await writeFile(out, text, 'utf8')
+      io.stdout(`${events.length} event(s) written to ${out}.`)
+      return 0
+    }
+    for (const line of text.split('\n')) {
+      if (line !== '') io.stdout(line)
+    }
+    // The summary goes to stderr so `swipeline export db > history.jsonl` stays clean.
+    io.stderr(`${events.length} event(s) exported.`)
+    return 0
+  } catch (cause) {
+    io.stderr(`Could not export from ${path}: ${messageOf(cause)}`)
+    return 1
+  } finally {
+    stores.close()
+  }
+}
+
+async function importHistory(args: readonly string[], io: CliIo): Promise<number> {
+  const [path, file] = args
+  if (path === undefined || file === undefined || args.length > 2) {
+    io.stderr('import needs a SQLite database and one JSONL file')
+    return 2
+  }
+
+  let result: HistoryValidation
+  try {
+    result = await validateHistoryFile(file)
+  } catch (cause) {
+    io.stderr(`Could not read ${file}: ${messageOf(cause)}`)
+    return 1
+  }
+
+  for (const error of result.errors) io.stderr(`line ${error.line}: ${error.message}`)
+  if (result.errors.length > 0) {
+    // All or nothing: a half-imported history is harder to reason about than a
+    // rejected one, and the file can simply be fixed and re-run.
+    io.stderr(`${result.errors.length} invalid line(s); nothing imported.`)
+    return 1
+  }
+
+  const stores = createSqliteStores({ path })
+  try {
+    const before = (await stores.events.query({})).length
+    await stores.events.append(result.events)
+    const after = (await stores.events.query({})).length
+    io.stdout(`${after - before} new event(s) imported from ${file} (${after} total).`)
+    return 0
+  } catch (cause) {
+    io.stderr(`Could not import into ${path}: ${messageOf(cause)}`)
+    return 1
+  } finally {
+    stores.close()
+  }
+}
+
+async function writable(directory: string): Promise<boolean> {
+  try {
+    await access(directory, constants.W_OK)
+    return true
+  } catch {
+    return false
+  }
+}
+
+async function packageVersion(): Promise<string> {
+  try {
+    const text = await readFile(new URL('../package.json', import.meta.url), 'utf8')
+    return (JSON.parse(text) as { version?: string }).version ?? '0.0.0'
+  } catch {
+    return '0.0.0'
+  }
+}
+
+async function doctor(args: readonly string[], io: CliIo): Promise<number> {
+  const parsed = parseFlags(args, { db: 'string' })
+  if (!parsed.ok) {
+    io.stderr(parsed.message)
+    return 2
+  }
+  const [extra] = parsed.positionals
+  if (extra !== undefined) {
+    io.stderr(`Unexpected argument: ${extra}`)
+    return 2
+  }
+
+  const major = Number(process.versions.node.split('.')[0])
+  io.stdout(`swipeline ${await packageVersion()}`)
+  io.stdout(`node ${process.version} (>=${MINIMUM_NODE_MAJOR} required)`)
+  io.stdout(`fetch: ${typeof globalThis.fetch === 'function' ? 'available' : 'missing'}`)
+  if (major < MINIMUM_NODE_MAJOR) {
+    io.stderr(`node ${MINIMUM_NODE_MAJOR} or newer is required; this is ${process.version}.`)
+    return 1
+  }
+
+  const path = stringFlag(parsed.flags, 'db')
+  if (path === undefined) {
+    io.stdout('database: none (serve and import create one when you pass --db)')
+    return 0
+  }
+  if (!existsSync(path)) {
+    io.stdout(`database: ${path} (does not exist yet)`)
+    io.stdout(`directory writable: ${(await writable(dirname(path))) ? 'yes' : 'no'}`)
+    return 0
+  }
+
+  const stores = createSqliteStores({ path })
+  try {
+    const events = (await stores.events.query({})).length
+    io.stdout(`database: ${path} (schema ${stores.schemaVersion}, ${events} event(s))`)
+    io.stdout(`directory writable: ${(await writable(dirname(path))) ? 'yes' : 'no'}`)
+    return 0
+  } catch (cause) {
+    io.stderr(`Could not open ${path}: ${messageOf(cause)}`)
+    return 1
+  } finally {
+    stores.close()
+  }
+}
+
+function formatMetric(value: number | null): string {
+  return value === null ? '-' : value.toFixed(3)
+}
+
+function reportTable(report: BenchReport): string[] {
+  const rows = Object.entries(report.strategies).map(([name, metrics]) => [
+    name.padEnd(12),
+    metrics.precisionAtK.toFixed(3),
+    formatMetric(metrics.timeToFirstLike),
+    metrics.diversity.toFixed(3),
+  ])
+  return [
+    `${'strategy'.padEnd(12)} precision@k  timeToFirstLike  diversity`,
+    ...rows.map((cells) => cells.join('  ')),
+  ]
+}
+
+async function bench(args: readonly string[], io: CliIo, runner: BenchRunner): Promise<number> {
+  const parsed = parseFlags(args, {
+    seed: 'integer',
+    users: 'integer',
+    cards: 'integer',
+    k: 'integer',
+    gate: 'boolean',
+  })
+  if (!parsed.ok) {
+    io.stderr(parsed.message)
+    return 2
+  }
+  const [extra] = parsed.positionals
+  if (extra !== undefined) {
+    io.stderr(`Unexpected argument: ${extra}`)
+    return 2
+  }
+
+  const options: Parameters<BenchRunner>[0] = {}
+  const seed = numberFlag(parsed.flags, 'seed')
+  const users = numberFlag(parsed.flags, 'users')
+  const cards = numberFlag(parsed.flags, 'cards')
+  const k = numberFlag(parsed.flags, 'k')
+  if (seed !== undefined) options.seed = seed
+  if (users !== undefined) options.users = users
+  if (cards !== undefined) options.cards = cards
+  if (k !== undefined) options.k = k
+
+  const report = await runner(options)
+  for (const line of reportTable(report)) io.stdout(line)
+
+  if (parsed.flags.gate !== true) return 0
+
+  const best = Math.max(...BASELINES.map((name) => report.strategies[name].precisionAtK))
+  const bestName =
+    BASELINES.find((name) => report.strategies[name].precisionAtK === best) ?? 'random'
+  if (report.strategies.default.precisionAtK <= best) {
+    io.stderr(
+      `default precision@${report.k} (${report.strategies.default.precisionAtK.toFixed(3)}) did not beat the best baseline (${bestName} ${best.toFixed(3)}).`,
+    )
+    return 3
+  }
+  io.stderr(
+    `default precision@${report.k} (${report.strategies.default.precisionAtK.toFixed(3)}) beats the best baseline (${bestName} ${best.toFixed(3)}).`,
+  )
+  return 0
+}
+
 /** Entry point for tests and for the `swipeline` bin. Returns the exit code. */
-export async function run(argv: readonly string[], io: CliIo = consoleIo): Promise<number> {
+export async function run(
+  argv: readonly string[],
+  io: CliIo = consoleIo,
+  benchmark: BenchRunner = runBenchmark,
+): Promise<number> {
   const [command, ...rest] = argv
 
   if (!command || command === 'help' || command === '--help' || command === '-h') {
@@ -170,6 +507,10 @@ export async function run(argv: readonly string[], io: CliIo = consoleIo): Promi
 
   if (command === 'serve') return serve(rest, io)
   if (command === 'validate') return validate(rest, io)
+  if (command === 'export') return exportHistory(rest, io)
+  if (command === 'import') return importHistory(rest, io)
+  if (command === 'doctor') return doctor(rest, io)
+  if (command === 'bench') return bench(rest, io, benchmark)
 
   io.stderr(`Unknown command: ${command}`)
   io.stderr(USAGE)

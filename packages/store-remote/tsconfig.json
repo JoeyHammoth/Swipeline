@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "paths": {
+      "@swipeline/core": ["../../packages/core/src/index.ts"],
+      "@swipeline/server": ["../../packages/server/src/index.ts"],
+      "@swipeline/store-memory": ["../../packages/store-memory/src/index.ts"]
+    }
+  },
+  "include": ["src/**/*.ts", "test/**/*.ts"]
+}

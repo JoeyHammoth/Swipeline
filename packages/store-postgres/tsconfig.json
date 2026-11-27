@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "paths": {
+      "@swipeline/core": ["../../packages/core/src/index.ts"],
+      "@swipeline/store-memory/conformance": ["../../packages/store-memory/src/conformance.ts"]
+    }
+  },
+  "include": ["src/**/*.ts", "test/**/*.ts"]
+}

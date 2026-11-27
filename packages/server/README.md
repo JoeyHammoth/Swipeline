@@ -50,8 +50,19 @@ createServer({
 `access-control-allow-credentials` are never combined, because browsers reject
 that pair.
 
+## Storage
+
+`MemoryEventStore` is fine for a test, not for production. Durable stores live
+next to this package:
+
+- `@swipeline/store-sqlite` — one file, Node's `node:sqlite`, no native build.
+- `@swipeline/store-postgres` — any `pg`-compatible client.
+
+`swipeline serve --db ./swipes.db` wires the SQLite store for you.
+
 ## Not here yet
 
-SQLite and Postgres stores, the remote store with outbox sync, webhooks, the
-OpenAPI document and server-side ranking. The route list above is the honest
+Server-side ranking, collections, the OpenAPI document and webhook delivery from
+this process. Webhooks are a `Sink` from `@swipeline/sinks`; the server exposes
+history and leaves delivery to the caller. The route list above is the honest
 coverage; the design plan's M3 section has the rest.

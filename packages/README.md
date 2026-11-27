@@ -19,7 +19,9 @@ list; see [`docs/architecture/overview.md`](../docs/architecture/overview.md).
 | `vue`, `svelte` | M4 | Thin first-party bindings |
 | `embed` | M2 | Transformers.js, OpenAI-compatible and Ollama embedders |
 | `vector` | M2 | Brute-force exact index, `sqlite-vec` and `pgvector` drivers |
-| `store-sqlite`, `store-postgres` | M3 | Server-side stores |
+| `store-sqlite` | M3 | SQLite stores via `node:sqlite`, no native build |
+| `store-postgres` | M3 | Postgres stores over any `pg`-compatible client |
+| `store-remote` | M3 | HTTP event store and outbox sync against the server |
 | `sinks` | M3 | HMAC-signed webhook, JSONL, console |
 | `bench` | M2 | Synthetic-user benchmark harness |
 | `server` | M3 | Optional Hono server: sync, ranking, webhooks |

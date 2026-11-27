@@ -138,7 +138,7 @@ Gorse and similar engines are a complement, not a competitor: an `external` rank
 | Path | What lives there |
 |---|---|
 | `packages/core` | Card/event/profile schemas, config, deck engine (the only runtime dependency is a schema library) |
-| `packages/` | 19 workspace packages: `core`, `rank`, `embed`, `vector`, `store-memory`, `store-indexeddb`, `gestures`, `element`, `react`, `binding-testkit`, `bench`, `server`, `cli`, `adapter-http-json`, `adapter-testkit`, `adapter-arxiv`, `adapter-openlibrary`, `adapter-themealdb`, `adapter-tmdb` |
+| `packages/` | 23 workspace packages: `core`, `rank`, `embed`, `vector`, `store-memory`, `store-indexeddb`, `store-sqlite`, `store-postgres`, `store-remote`, `gestures`, `element`, `react`, `binding-testkit`, `bench`, `sinks`, `server`, `cli`, `adapter-http-json`, `adapter-testkit`, `adapter-arxiv`, `adapter-openlibrary`, `adapter-themealdb`, `adapter-tmdb` |
 | `docs/` | VitePress documentation site, ADRs, research notes and the design plan |
 | `examples/` | Runnable demos that share one `deck.config.ts` across frameworks |
 | `adapters/` | Compatibility pointer to first-party source adapters in `packages/adapter-*` |

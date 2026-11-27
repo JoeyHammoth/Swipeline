@@ -98,10 +98,11 @@ Binding conformance suite for Swipeline: keyboard, buttons, undo, a11y and lifec
 
 ## `@swipeline/cli`
 
-The swipeline command: serve the HTTP API and validate a JSONL history.
+The swipeline command: serve the HTTP API, validate, export and import a history, run the benchmark.
 
 | Symbol | Kind | Summary |
 | --- | --- | --- |
+| `BenchRunner` | type | Runs the benchmark. Injected in tests so `swipeline bench` is not slow. |
 | `CliIo` | interface |  |
 | `HistoryValidation` | interface |  |
 | `parseServeOptions` | function |  |
@@ -279,6 +280,23 @@ Optional HTTP service: append events, export a history and erase an actor.
 | `ServerOptions` | interface |  |
 | `SwipelineServer` | interface |  |
 
+## `@swipeline/sinks`
+
+Event sinks: HMAC-signed webhook, JSONL file and console.
+
+| Symbol | Kind | Summary |
+| --- | --- | --- |
+| `consoleSink` | function | One readable line per event, for local development. |
+| `ConsoleSinkOptions` | interface |  |
+| `deliveryId` | function | The idempotency key for a batch: the same events always get the same id. |
+| `jsonlFileSink` | function | Appends one JSON object per line, the format `swipeline validate` reads. |
+| `JsonlFileSinkOptions` | interface |  |
+| `signWebhook` | function | `t=&lt;unix seconds&gt;,v1=&lt;hex hmac of `t.body`&gt;`, the Stripe-style scheme. |
+| `VerifyWebhookOptions` | interface |  |
+| `verifyWebhookSignature` | function | The receiver side of `webhookSink`: verify the signature in constant time and |
+| `webhookSink` | function | POSTs each batch as JSON, signed with HMAC-SHA256 and tagged with a delivery |
+| `WebhookSinkOptions` | interface |  |
+
 ## `@swipeline/store-indexeddb`
 
 IndexedDB-backed Swipeline stores for the browser.
@@ -299,6 +317,41 @@ In-memory Swipeline stores for tests, SSR and small demos.
 | `MemoryItemStore` | class | Upsert-by-id cache of normalized cards. |
 | `MemoryProfileStore` | class | Derived profiles, keyed by actor and deck. |
 | `MemoryStores` | interface |  |
+
+## `@swipeline/store-postgres`
+
+Postgres-backed Swipeline stores over any pg-compatible client.
+
+| Symbol | Kind | Summary |
+| --- | --- | --- |
+| `PostgresClient` | interface | The subset of `pg`'s client/pool that these stores use. |
+| `PostgresStoreOptions` | interface |  |
+| `PostgresStores` | interface |  |
+
+## `@swipeline/store-remote`
+
+HTTP event store and outbox sync against @swipeline/server.
+
+| Symbol | Kind | Summary |
+| --- | --- | --- |
+| `createOutbox` | function | Outbox sync between a local log and a remote one. The local log is the queue: |
+| `CursorStore` | interface |  |
+| `httpEventStore` | function | `EventStore` over the `@swipeline/server` HTTP API. Retries transport failures, |
+| `HttpEventStoreOptions` | interface |  |
+| `memoryCursorStore` | function | In-memory cursor. A restart re-sends the log, which the server dedupes. |
+| `Outbox` | interface |  |
+| `OutboxOptions` | interface |  |
+| `RemoteStoreError` | class | A request that did not succeed. `status` is absent when the request never landed. |
+
+## `@swipeline/store-sqlite`
+
+SQLite-backed Swipeline stores for Node, Bun and the CLI (node:sqlite, no native build).
+
+| Symbol | Kind | Summary |
+| --- | --- | --- |
+| `createSqliteStores` | function |  |
+| `SqliteStoreOptions` | interface |  |
+| `SqliteStores` | interface |  |
 
 ## `@swipeline/vector`
 

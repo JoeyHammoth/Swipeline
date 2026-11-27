@@ -5,9 +5,10 @@ Node HTTP service that implements the same store interfaces as the client, so a
 deck behaves identically whether ranking runs in the browser or on the server.
 
 ::: warning Milestone M3 in progress
-`@swipeline/server` implements health, event append, export and erase. SQLite and
-Postgres storage, server-side ranking, collections, webhooks and the OpenAPI
-document are planned; the table below marks what actually works.
+`@swipeline/server` implements health, event append, export and erase, and durable
+SQLite and Postgres stores ship alongside it. Server-side ranking, collections,
+webhook delivery from the server process and the OpenAPI document are still
+planned; the tables below mark what actually works.
 :::
 
 ## Run it
@@ -16,20 +17,31 @@ document are planned; the table below marks what actually works.
 npx swipeline serve --port 8787 --cors https://app.example.com
 ```
 
-`serve` currently uses the in-memory event log, so history lasts only as long as
-the process. Or wire it up yourself:
+Pass `--db` to keep the log in SQLite across restarts:
+
+```bash
+npx swipeline serve --port 8787 --db ./swipes.db
+```
+
+Without it the log is in memory and history lasts only as long as the process. Or
+wire it up yourself, choosing the store you want:
 
 ```ts
-import { MemoryEventStore } from '@swipeline/core'
 import { createServer } from '@swipeline/server'
+import { createSqliteStores } from '@swipeline/store-sqlite'
 
+const stores = createSqliteStores({ path: './swipes.db' })
 const server = createServer({
-  events: new MemoryEventStore(),
+  events: stores.events,
   cors: ['https://app.example.com'],
 })
 const running = await server.listen(8787)
 console.log(running.url)
 ```
+
+Postgres is the same shape with `createPostgresStores({ client: pool })` from
+`@swipeline/store-postgres`, where `pool` is a `pg.Pool` or any client with
+`query(text, values)`.
 
 ## API surface
 
@@ -83,20 +95,38 @@ sequenceDiagram
 
 Events are append-only, so last-write-wins is not needed: duplicates are dropped
 by id, and ordering is by ULID. A client that has been offline flushes its outbox
-in order.
+in order:
+
+```ts
+import { createOutbox, httpEventStore } from '@swipeline/store-remote'
+
+const outbox = createOutbox({
+  local: indexedDbEvents, // the local log doubles as the outbox
+  remote: httpEventStore({ url: 'https://swipes.example.com', token: getJwt }),
+})
+await outbox.sync('reader')
+```
+
+The local log *is* the queue: an event counts as delivered only once the server
+answers, so a failed push leaves it pending and nothing is lost.
 
 ## Webhooks
 
-Planned with `sinks`. The intended signature is `X-Swipeline-Signature:
-t=<unix>,v1=<hmac-sha256(t + "." + body, secret)>`, with receivers rejecting
-timestamps older than five minutes. Nothing signs or delivers webhooks yet.
+`@swipeline/sinks` ships `webhookSink`, which sends `X-Swipeline-Signature:
+t=<unix>,v1=<hmac-sha256(t + "." + body, secret)>` and a stable
+`X-swipeline-delivery` id per batch. `verifyWebhookSignature` is the receiver
+side: constant-time comparison plus a five-minute timestamp window, so a captured
+request cannot be replayed later.
+
+Delivery is a client concern: a `Sink` runs where the engine runs, and the server
+process does not call webhooks itself.
 
 ## Operations
 
 | Concern | Guidance |
 |---|---|
-| Backups | Not applicable to the in-memory store; a durable store arrives with storage |
-| Migrations | Planned with SQLite/Postgres |
+| Backups | Back up the SQLite file or your Postgres database; the in-memory store has nothing to back up |
+| Migrations | The store packages create their tables on open and never migrate your schema; SQLite refuses a database written by a newer package instead of stamping it down |
 | Rate limits | Put the server behind a proxy; it does not rate-limit by actor |
 | Logs | The server writes no request logs today; add them at your proxy |
 | Deletion | `DELETE /actors/:actor` is synchronous and irreversible |

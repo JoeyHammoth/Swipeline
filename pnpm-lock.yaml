@@ -568,12 +568,18 @@ importers:
 
   packages/cli:
     dependencies:
+      '@swipeline/bench':
+        specifier: workspace:*
+        version: link:../bench
       '@swipeline/core':
         specifier: workspace:*
         version: link:../core
       '@swipeline/server':
         specifier: workspace:*
         version: link:../server
+      '@swipeline/store-sqlite':
+        specifier: workspace:*
+        version: link:../store-sqlite
     devDependencies:
       tsup:
         specifier: ^9.0.0
@@ -718,6 +724,22 @@ importers:
         specifier: ^5.1.1
         version: 5.1.1(@types/node@26.6.6)(@vitest/coverage-v8@5.1.1)(jsdom@31.0.1)(vite@6.4.6(@types/node@26.6.6)(lightningcss@1.33.0)(yaml@2.9.1))
 
+  packages/sinks:
+    dependencies:
+      '@swipeline/core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      tsup:
+        specifier: ^9.0.0
+        version: 9.0.0(postcss@8.5.33)(typescript@7.0.2)(yaml@2.9.1)
+      typescript:
+        specifier: ^7.0.2
+        version: 7.0.2
+      vitest:
+        specifier: ^5.1.1
+        version: 5.1.1(@types/node@26.6.6)(@vitest/coverage-v8@5.1.1)(jsdom@31.0.1)(vite@6.4.6(@types/node@26.6.6)(lightningcss@1.33.0)(yaml@2.9.1))
+
   packages/store-indexeddb:
     dependencies:
       '@swipeline/core':
@@ -749,6 +771,69 @@ importers:
       fake-indexeddb:
         specifier: ^6.2.5
         version: 6.2.8
+      tsup:
+        specifier: ^9.0.0
+        version: 9.0.0(postcss@8.5.33)(typescript@7.0.2)(yaml@2.9.1)
+      typescript:
+        specifier: ^7.0.2
+        version: 7.0.2
+      vitest:
+        specifier: ^5.1.1
+        version: 5.1.1(@types/node@26.6.6)(@vitest/coverage-v8@5.1.1)(jsdom@31.0.1)(vite@6.4.6(@types/node@26.6.6)(lightningcss@1.33.0)(yaml@2.9.1))
+
+  packages/store-postgres:
+    dependencies:
+      '@swipeline/core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      '@electric-sql/pglite':
+        specifier: ^0.6.0
+        version: 0.6.0
+      '@swipeline/store-memory':
+        specifier: workspace:*
+        version: link:../store-memory
+      tsup:
+        specifier: ^9.0.0
+        version: 9.0.0(postcss@8.5.33)(typescript@7.0.2)(yaml@2.9.1)
+      typescript:
+        specifier: ^7.0.2
+        version: 7.0.2
+      vitest:
+        specifier: ^5.1.1
+        version: 5.1.1(@types/node@26.6.6)(@vitest/coverage-v8@5.1.1)(jsdom@31.0.1)(vite@6.4.6(@types/node@26.6.6)(lightningcss@1.33.0)(yaml@2.9.1))
+
+  packages/store-remote:
+    dependencies:
+      '@swipeline/core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      '@swipeline/server':
+        specifier: workspace:*
+        version: link:../server
+      '@swipeline/store-memory':
+        specifier: workspace:*
+        version: link:../store-memory
+      tsup:
+        specifier: ^9.0.0
+        version: 9.0.0(postcss@8.5.33)(typescript@7.0.2)(yaml@2.9.1)
+      typescript:
+        specifier: ^7.0.2
+        version: 7.0.2
+      vitest:
+        specifier: ^5.1.1
+        version: 5.1.1(@types/node@26.6.6)(@vitest/coverage-v8@5.1.1)(jsdom@31.0.1)(vite@6.4.6(@types/node@26.6.6)(lightningcss@1.33.0)(yaml@2.9.1))
+
+  packages/store-sqlite:
+    dependencies:
+      '@swipeline/core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      '@swipeline/store-memory':
+        specifier: workspace:*
+        version: link:../store-memory
       tsup:
         specifier: ^9.0.0
         version: 9.0.0(postcss@8.5.33)(typescript@7.0.2)(yaml@2.9.1)
@@ -1129,6 +1214,9 @@ packages:
         optional: true
       search-insights:
         optional: true
+
+  '@electric-sql/pglite@0.6.0':
+    resolution: {integrity: sha512-g3tAPFjRLEdN1g5FvawTl4ETo9LtmVwBRUJYnH6Erl6mhlKFRGB2mYhPABffIuXMYxki64mX0Al8U4UFUhuYDQ==}
 
   '@esbuild/aix-ppc64@0.25.12':
     resolution: {integrity: sha512-Hhmwd6CInZ3dwpuGTF8fJG6yoWmsToE+vYgD4nytZVxcu1ulHpUQRAB1UJ8+N1Am3Mz4+xOByoQoSZf4D+CpkA==}
@@ -3509,6 +3597,8 @@ snapshots:
       search-insights: 2.17.3
     transitivePeerDependencies:
       - '@algolia/client-search'
+
+  '@electric-sql/pglite@0.6.0': {}
 
   '@esbuild/aix-ppc64@0.25.12':
     optional: true

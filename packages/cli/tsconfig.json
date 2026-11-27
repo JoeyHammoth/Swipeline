@@ -3,8 +3,10 @@
   "compilerOptions": {
     "types": ["node"],
     "paths": {
+      "@swipeline/bench": ["../../packages/bench/src/index.ts"],
       "@swipeline/core": ["../../packages/core/src/index.ts"],
-      "@swipeline/server": ["../../packages/server/src/index.ts"]
+      "@swipeline/server": ["../../packages/server/src/index.ts"],
+      "@swipeline/store-sqlite": ["../../packages/store-sqlite/src/index.ts"]
     }
   },
   "include": ["src/**/*.ts", "test/**/*.ts"]
