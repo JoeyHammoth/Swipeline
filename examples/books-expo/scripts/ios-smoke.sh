@@ -32,7 +32,9 @@ fi
 echo "Workspace: $WORKSPACE, scheme: $SCHEME"
 
 # A Release build inlines the JavaScript bundle, so the simulator needs no Metro.
-xcodebuild \
+# The full log goes to a file: GitHub truncates a 20k-line xcodebuild run and
+# takes the error lines with it, so only the failures are printed.
+if ! xcodebuild \
   -workspace "$WORKSPACE" \
   -scheme "$SCHEME" \
   -configuration Release \
@@ -40,7 +42,13 @@ xcodebuild \
   -destination 'generic/platform=iOS Simulator' \
   -derivedDataPath ios/build \
   CODE_SIGNING_ALLOWED=NO \
-  build
+  build > ios-build.log 2>&1; then
+  echo "--- build errors"
+  grep -E "error:|The following build commands failed" -A 4 ios-build.log | sed -n 1,60p
+  echo "--- tail"
+  tail -20 ios-build.log
+  exit 1
+fi
 
 # BSD find on macOS has no `-maxdepth`, so search the products tree by name.
 # `sed -n 1p` rather than `head -1`: head closes the pipe and `pipefail` would

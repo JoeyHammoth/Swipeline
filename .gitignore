@@ -52,3 +52,6 @@ pnpm-debug.log*
 
 # Scaffolded by scripts/check-templates.mjs; never committed.
 examples/scaffold-*/
+# Logs written by the simulator smoke script.
+examples/books-expo/ios-build.log
+examples/books-expo/sim.log
