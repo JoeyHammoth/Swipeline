@@ -16,8 +16,19 @@ if [ -z "$UDID" ] || [ "$UDID" = "null" ]; then
 fi
 echo "Simulator: $UDID"
 
-WORKSPACE=$(ls -d ios/*.xcworkspace | head -1)
-SCHEME=$(xcodebuild -workspace "$WORKSPACE" -list -json | jq -r '.workspace.schemes[0]')
+WORKSPACE=$(ls -d ios/*.xcworkspace | sed -n 1p)
+PROJECT=$(ls -d ios/*.xcodeproj | sed -n 1p)
+# The workspace lists every Pods scheme too (`boost` sorts first), so pick the
+# scheme named after the app's own project, and only fall back to the first
+# non-Pods scheme.
+WANTED=$(basename "$PROJECT" .xcodeproj)
+SCHEMES=$(xcodebuild -workspace "$WORKSPACE" -list -json | jq -r '.workspace.schemes[]')
+SCHEME=$(printf '%s\n' "$SCHEMES" | grep -Fx "$WANTED" || printf '%s\n' "$SCHEMES" | grep -v '^Pods' | sed -n 1p)
+if [ -z "$SCHEME" ]; then
+  echo "::error::no app scheme in $WORKSPACE; schemes were:"
+  printf '%s\n' "$SCHEMES"
+  exit 1
+fi
 echo "Workspace: $WORKSPACE, scheme: $SCHEME"
 
 # A Release build inlines the JavaScript bundle, so the simulator needs no Metro.
