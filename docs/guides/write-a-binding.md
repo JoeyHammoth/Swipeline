@@ -72,10 +72,11 @@ Covered: render from the snapshot, a control per action, pointer gestures on the
 root, ArrowRight advancing, `u` undoing, a polite live region, and teardown that
 detaches the root. Failures are collected into one `BindingConformanceError`.
 
-The suite is DOM-based and runs twice: under jsdom in
-`packages/react/test/conformance.test.tsx` and
-`packages/element/test/element.test.ts`, and in Chromium against the fixture pages
-in `examples/conformance`, driven by `e2e/binding-conformance.spec.ts` in
+The suite is DOM-based and runs twice: under jsdom in each binding's package
+test (`packages/react/test/conformance.test.tsx`,
+`packages/vue/test/conformance.test.ts`, `packages/svelte/test/conformance.test.ts`,
+`packages/element/test/element.test.ts`), and in Chromium against the fixture
+pages in `examples/conformance`, driven by `e2e/binding-conformance.spec.ts` in
 `e2e.yml`. The [binding status matrix](/reference/binding-status) lists only
 bindings with a passing run.
 

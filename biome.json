@@ -15,7 +15,9 @@
       "!docs/public",
       "!**/*.md",
       "!pnpm-lock.yaml",
-      "!**/*.vue"
+      "!**/*.vue",
+      "!**/*.svelte",
+      "!**/.svelte-kit"
     ]
   },
   "formatter": {

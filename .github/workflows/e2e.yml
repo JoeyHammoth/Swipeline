@@ -10,6 +10,7 @@ on:
       - "packages/react/**"
       - "packages/element/**"
       - "packages/vue/**"
+      - "packages/svelte/**"
       - "packages/cards/**"
       - "packages/theme/**"
       - "packages/i18n/**"

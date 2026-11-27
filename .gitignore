@@ -17,6 +17,7 @@ out/
 *.tsbuildinfo
 .turbo/
 .vite/
+.svelte-kit/
 coverage/
 docs/.vitepress/dist/
 docs/.vitepress/cache/

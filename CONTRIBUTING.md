@@ -13,7 +13,9 @@ By participating you agree to the [Code of Conduct](CODE_OF_CONDUCT.md).
 - **One change per pull request.** Keep it reviewable; squash merges keep
   `main` linear.
 - **A changeset for every user-facing change.** Run `pnpm changeset` and commit
-  the generated file. Docs-only and CI-only changes do not need one. A release
+  the generated file. Every package is in one changesets `fixed` group, so the
+  highest bump in a release applies to all of them and versions never drift
+  apart. Docs-only and CI-only changes do not need one. A release
   commit on `main` has none by design — it consumes them — so
   `pnpm changeset:status` reports "no changesets were found" there. That error is
   expected on a release commit and nowhere else.
@@ -50,8 +52,27 @@ Useful scripts:
 | `pnpm check:boundaries` | Fail on framework dependencies outside bindings |
 | `pnpm licenses:check` | Dependency license policy |
 | `pnpm package:licenses` | Published packages carry `LICENSE` and `NOTICE` |
+| `pnpm e2e` | Binding conformance in Chromium (see below) |
 | `pnpm docs:dev` / `pnpm docs:build` | VitePress site |
 | `pnpm changeset` | Record a user-facing change |
+
+### Browser conformance
+
+`pnpm e2e` runs the shared binding conformance suite in Chromium against the
+fixture pages in `examples/conformance`, then checks the same page with axe. It
+needs a browser binary, which `pnpm install` does not fetch:
+
+```bash
+pnpm exec playwright install chromium   # once per machine; add --with-deps on Linux
+pnpm e2e
+pnpm e2e -- -g svelte                   # one binding
+PLAYWRIGHT_CHANNEL=chrome pnpm e2e      # use an installed Chrome instead
+```
+
+Playwright starts the fixture dev server itself, so no prior `pnpm build` is
+needed. `e2e.yml` runs the same suite on pull requests that touch a binding,
+nightly, and on demand (`gh workflow run e2e.yml --ref main`) — a push to `main`
+does not trigger it, so dispatch it after merging binding work.
 
 ## Where things live
 

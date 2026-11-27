@@ -20,7 +20,7 @@ list; see [`docs/architecture/overview.md`](../docs/architecture/overview.md).
 | `theme` | M4 | Design tokens, light and dark palettes, CSS output |
 | `i18n` | M4 | Message catalog and translator for binding strings |
 | `react-native` | M4 | React Native / Expo binding |
-| `vue`, `svelte` | M4 | Thin first-party bindings |
+| `svelte` | M4 | Svelte 5 binding over `core` + `gestures` |
 | `embed` | M2 | Transformers.js, OpenAI-compatible and Ollama embedders |
 | `vector` | M2 | Brute-force exact index, `sqlite-vec` and `pgvector` drivers |
 | `store-sqlite` | M3 | SQLite stores via `node:sqlite`, no native build |

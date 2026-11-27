@@ -403,6 +403,14 @@ SQLite-backed Swipeline stores for Node, Bun and the CLI (node:sqlite, no native
 | `SqliteStoreOptions` | interface |  |
 | `SqliteStores` | interface |  |
 
+## `@swipeline/svelte`
+
+Svelte 5 binding for Swipeline decks: SwipeDeck, keyboard and live regions.
+
+| Symbol | Kind | Summary |
+| --- | --- | --- |
+| `SwipeDeckProps` | interface | Props accepted by the Svelte `&lt;SwipeDeck&gt;` component. |
+
 ## `@swipeline/theme`
 
 The shared design-token vocabulary: light and dark palettes, CSS variables and overflow-safe overrides.

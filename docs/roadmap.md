@@ -78,7 +78,8 @@ deck, no framework imports outside binding packages, playground v0 live.
 ## M4 — v0.5: mobile and breadth
 
 - [x] `vue` binding, passing the shared conformance suite in jsdom and Chromium
-- [ ] `react-native` binding and thin `svelte` binding
+- [x] thin `svelte` binding, passing the shared conformance suite in jsdom and Chromium
+- [ ] `react-native` binding
 - [x] Adapter registry: schema-validated, with a generated docs catalog
 - [ ] Accessibility audit (automated rules are in CI; assistive-technology passes are manual)
 - [x] OpenAPI specification for the server (`GET /openapi.json`)

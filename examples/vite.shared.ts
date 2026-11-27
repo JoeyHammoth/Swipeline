@@ -19,6 +19,7 @@ export const workspaceAliases: Record<string, string> = {
   '@swipeline/gestures': source('../packages/gestures/src/index.ts'),
   '@swipeline/i18n': source('../packages/i18n/src/index.ts'),
   '@swipeline/theme': source('../packages/theme/src/index.ts'),
+  '@swipeline/svelte': source('../packages/svelte/src/index.ts'),
   '@swipeline/vue': source('../packages/vue/src/index.ts'),
   // Longest key first: Vite aliases match by prefix, so the stylesheet must be
   // listed before the package root that would otherwise resolve it as a subpath.

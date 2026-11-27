@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": [],
+    "paths": {
+      "@swipeline/binding-testkit": ["../../packages/binding-testkit/src/index.ts"],
+      "@swipeline/cards": ["../../packages/cards/src/index.ts"],
+      "@swipeline/core": ["../../packages/core/src/index.ts"],
+      "@swipeline/gestures": ["../../packages/gestures/src/index.ts"],
+      "@swipeline/i18n": ["../../packages/i18n/src/index.ts"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.svelte", "test/**/*.ts"]
+}

@@ -1,42 +1,56 @@
 import { fileURLToPath } from 'node:url'
+import { svelte } from '@sveltejs/vite-plugin-svelte'
 import { defineConfig } from 'vitest/config'
 
 const source = (path: string): string => fileURLToPath(new URL(path, import.meta.url))
 
+// Tests import workspace packages by name. Resolve them to source so a test run
+// does not depend on a prior build, and so coverage is measured there.
+const workspaceAliases: Record<string, string> = {
+  '@swipeline/store-memory/conformance': source('./packages/store-memory/src/conformance.ts'),
+  '@swipeline/adapter-testkit': source('./packages/adapter-testkit/src/index.ts'),
+  '@swipeline/adapter-http-json': source('./packages/adapter-http-json/src/index.ts'),
+  '@swipeline/store-indexeddb': source('./packages/store-indexeddb/src/index.ts'),
+  '@swipeline/store-postgres': source('./packages/store-postgres/src/index.ts'),
+  '@swipeline/store-remote': source('./packages/store-remote/src/index.ts'),
+  '@swipeline/store-sqlite': source('./packages/store-sqlite/src/index.ts'),
+  '@swipeline/sinks': source('./packages/sinks/src/index.ts'),
+  '@swipeline/store-memory': source('./packages/store-memory/src/index.ts'),
+  '@swipeline/gestures': source('./packages/gestures/src/index.ts'),
+  '@swipeline/cards': source('./packages/cards/src/index.ts'),
+  '@swipeline/theme': source('./packages/theme/src/index.ts'),
+  '@swipeline/i18n': source('./packages/i18n/src/index.ts'),
+  '@swipeline/vue': source('./packages/vue/src/index.ts'),
+  '@swipeline/svelte': source('./packages/svelte/src/index.ts'),
+  '@swipeline/core': source('./packages/core/src/index.ts'),
+  '@swipeline/server': source('./packages/server/src/index.ts'),
+  '@swipeline/cli': source('./packages/cli/src/index.ts'),
+  '@swipeline/bench': source('./packages/bench/src/index.ts'),
+  '@swipeline/rank': source('./packages/rank/src/index.ts'),
+  '@swipeline/react': source('./packages/react/src/index.ts'),
+  '@swipeline/embed': source('./packages/embed/src/index.ts'),
+  '@swipeline/vector': source('./packages/vector/src/index.ts'),
+  '@swipeline/adapter-openlibrary': source('./packages/adapter-openlibrary/src/index.ts'),
+  '@swipeline/adapter-themealdb': source('./packages/adapter-themealdb/src/index.ts'),
+  '@swipeline/adapter-arxiv': source('./packages/adapter-arxiv/src/index.ts'),
+  '@swipeline/adapter-tmdb': source('./packages/adapter-tmdb/src/index.ts'),
+  '@swipeline/element': source('./packages/element/src/index.ts'),
+  '@swipeline/binding-testkit': source('./packages/binding-testkit/src/index.ts'),
+}
+
 export default defineConfig({
+  // The Svelte binding's test imports a `.svelte` component, so the suite needs
+  // the framework compiler. The plugin only transforms `.svelte` files.
+  plugins: [svelte()],
   resolve: {
-    alias: {
-      // Tests import workspace packages by name. Resolve them to source so a test
-      // run does not depend on a prior build, and so coverage is measured there.
-      '@swipeline/store-memory/conformance': source('./packages/store-memory/src/conformance.ts'),
-      '@swipeline/adapter-testkit': source('./packages/adapter-testkit/src/index.ts'),
-      '@swipeline/adapter-http-json': source('./packages/adapter-http-json/src/index.ts'),
-      '@swipeline/store-indexeddb': source('./packages/store-indexeddb/src/index.ts'),
-      '@swipeline/store-postgres': source('./packages/store-postgres/src/index.ts'),
-      '@swipeline/store-remote': source('./packages/store-remote/src/index.ts'),
-      '@swipeline/store-sqlite': source('./packages/store-sqlite/src/index.ts'),
-      '@swipeline/sinks': source('./packages/sinks/src/index.ts'),
-      '@swipeline/store-memory': source('./packages/store-memory/src/index.ts'),
-      '@swipeline/gestures': source('./packages/gestures/src/index.ts'),
-      '@swipeline/cards': source('./packages/cards/src/index.ts'),
-      '@swipeline/theme': source('./packages/theme/src/index.ts'),
-      '@swipeline/i18n': source('./packages/i18n/src/index.ts'),
-      '@swipeline/vue': source('./packages/vue/src/index.ts'),
-      '@swipeline/core': source('./packages/core/src/index.ts'),
-      '@swipeline/server': source('./packages/server/src/index.ts'),
-      '@swipeline/cli': source('./packages/cli/src/index.ts'),
-      '@swipeline/bench': source('./packages/bench/src/index.ts'),
-      '@swipeline/rank': source('./packages/rank/src/index.ts'),
-      '@swipeline/react': source('./packages/react/src/index.ts'),
-      '@swipeline/embed': source('./packages/embed/src/index.ts'),
-      '@swipeline/vector': source('./packages/vector/src/index.ts'),
-      '@swipeline/adapter-openlibrary': source('./packages/adapter-openlibrary/src/index.ts'),
-      '@swipeline/adapter-themealdb': source('./packages/adapter-themealdb/src/index.ts'),
-      '@swipeline/adapter-arxiv': source('./packages/adapter-arxiv/src/index.ts'),
-      '@swipeline/adapter-tmdb': source('./packages/adapter-tmdb/src/index.ts'),
-      '@swipeline/element': source('./packages/element/src/index.ts'),
-      '@swipeline/binding-testkit': source('./packages/binding-testkit/src/index.ts'),
-    },
+    // Array form because one entry is a regex. Vitest externalises dependencies
+    // through Node, where the bare `svelte` specifier resolves to the server build
+    // that has no `mount()`. Pinning that exact specifier to the client entry fixes
+    // it; `svelte/internal/*` keeps resolving through the package exports.
+    alias: [
+      ...Object.entries(workspaceAliases).map(([find, replacement]) => ({ find, replacement })),
+      { find: /^svelte$/, replacement: source('./node_modules/svelte/src/index-client.js') },
+    ],
   },
   test: {
     include: ['packages/*/test/**/*.test.{ts,tsx}'],
