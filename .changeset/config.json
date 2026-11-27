@@ -21,6 +21,7 @@
       "@swipeline/i18n",
       "@swipeline/rank",
       "@swipeline/react",
+      "@swipeline/react-native",
       "@swipeline/server",
       "@swipeline/sinks",
       "@swipeline/store-indexeddb",

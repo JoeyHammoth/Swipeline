@@ -9,8 +9,8 @@ test results in this repository, not intentions.
 | Web Component | `@swipeline/element` | Official — passing | [`packages/element/test/element.test.ts`](https://github.com/JoeyHammoth/Swipeline/blob/main/packages/element/test/element.test.ts) | Chromium |
 | Vue 3 | `@swipeline/vue` | Official — passing | [`packages/vue/test/conformance.test.ts`](https://github.com/JoeyHammoth/Swipeline/blob/main/packages/vue/test/conformance.test.ts) | Chromium |
 | Svelte 5 | `@swipeline/svelte` | Official — passing | [`packages/svelte/test/conformance.test.ts`](https://github.com/JoeyHammoth/Swipeline/blob/main/packages/svelte/test/conformance.test.ts) | Chromium |
+| React Native / Expo | `@swipeline/react-native` | Official — not device-verified | [`packages/react-native/test/swipe-deck.test.tsx`](https://github.com/JoeyHammoth/Swipeline/blob/main/packages/react-native/test/swipe-deck.test.tsx) (mocked React Native surface) | — |
 | Solid, Angular | — | Planned | — | — |
-| React Native / Expo | — | Planned (M4) | — | — |
 
 Every binding passes the same seven behaviours through `assertBindingConformance`:
 the first card renders from the snapshot, there is at least one control per
@@ -39,6 +39,11 @@ lockfile, plus nightly and on demand. The jsdom suites run in `ci.yml` on every 
   against the server markup.
 - **Touch devices.** Browser conformance runs Chromium with mouse pointer events.
   Real touch and assistive-technology testing is manual.
+- **React Native.** The binding has no jsdom or browser suite: React Native is
+  Flow source that Node cannot load, so its render tests run against a mocked
+  `react-native` module, and the drag itself is covered only through
+  `intentFromGesture` unit tests. Nothing in this repository has run the deck on
+  iOS or Android, and there is no Expo example app yet.
 
 ## Adding a row
 

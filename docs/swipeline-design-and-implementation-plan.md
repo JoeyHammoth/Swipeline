@@ -407,7 +407,7 @@ Because the engine is headless, the same logic powers React, React Native, a Web
 | `@swipeline/gestures` | Any web framework | Framework-free pointer, keyboard and reduced-motion controller shared by all web bindings |
 | `@swipeline/element` | Any framework | `<swipe-deck>` Web Component; the reference binding, built early (M2) |
 | `@swipeline/react` | React (web) | Thin wrapper over the engine and `gestures`; no animation library required; optional motion integration |
-| `@swipeline/react-native` | React Native / Expo | Built on Reanimated and Gesture Handler as peer dependencies; shares the swipe-intent math |
+| `@swipeline/react-native` | React Native / Expo | Drags use `PanResponder` from React Native core, so no Gesture Handler or Reanimated install is required; shares the swipe-intent math |
 | `@swipeline/vue`, `@swipeline/svelte` | Vue, Svelte | Thin first-party bindings (M4), conformance-tested |
 | Community | Solid, Angular, Flutter and native (via OpenAPI + server) | "Write a binding" guide and the conformance suite |
 

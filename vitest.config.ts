@@ -28,6 +28,7 @@ const workspaceAliases: Record<string, string> = {
   '@swipeline/bench': source('./packages/bench/src/index.ts'),
   '@swipeline/rank': source('./packages/rank/src/index.ts'),
   '@swipeline/react': source('./packages/react/src/index.ts'),
+  '@swipeline/react-native': source('./packages/react-native/src/index.tsx'),
   '@swipeline/embed': source('./packages/embed/src/index.ts'),
   '@swipeline/vector': source('./packages/vector/src/index.ts'),
   '@swipeline/adapter-openlibrary': source('./packages/adapter-openlibrary/src/index.ts'),

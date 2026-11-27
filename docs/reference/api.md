@@ -318,6 +318,19 @@ React binding for Swipeline decks: SwipeDeck, useDeck, keyboard and live regions
 | `SwipeDeckProps` | interface |  |
 | `useDeck` | function | Subscribes a component to the engine's snapshot; SSR uses the stable server snapshot. |
 
+## `@swipeline/react-native`
+
+React Native and Expo binding for Swipeline decks: SwipeDeck, action buttons and swipe announcements.
+
+| Symbol | Kind | Summary |
+| --- | --- | --- |
+| `announcementFor` | function | The text a screen reader hears after the deck moves. Empty when there is no |
+| `GestureSample` | interface | One drag sample, in React Native's units: displacement in points and velocity |
+| `intentFromGesture` | function | Turns a native drag into a commit or a cancel with the same decision math the |
+| `SwipeDeck` | function | The React Native binding. It renders the shared card templates and string |
+| `SwipeDeckProps` | interface |  |
+| `useDeck` | function | Subscribes a component to the engine's snapshot. `getServerSnapshot` keeps the |
+
 ## `@swipeline/server`
 
 Optional HTTP service: append events, export a history and erase an actor.

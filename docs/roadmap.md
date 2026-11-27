@@ -79,7 +79,8 @@ deck, no framework imports outside binding packages, playground v0 live.
 
 - [x] `vue` binding, passing the shared conformance suite in jsdom and Chromium
 - [x] thin `svelte` binding, passing the shared conformance suite in jsdom and Chromium
-- [ ] `react-native` binding
+- [ ] `react-native` binding — implemented; not yet run on a device, simulator or
+  emulator, and the Expo demo app does not exist yet
 - [x] Adapter registry: schema-validated, with a generated docs catalog
 - [ ] Accessibility audit (automated rules are in CI; assistive-technology passes are manual)
 - [x] OpenAPI specification for the server (`GET /openapi.json`)
