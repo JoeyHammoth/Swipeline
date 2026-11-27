@@ -33,7 +33,9 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE",
+    "NOTICE"
   ],
   "scripts": {
     "build": "tsup src/index.ts src/conformance.ts --format esm,cjs --sourcemap --clean && tsc -p tsconfig.build.json && node -e \"const fs=require('node:fs');for (const f of ['index','conformance']) fs.copyFileSync('dist/'+f+'.d.ts', 'dist/'+f+'.d.cts')\"",

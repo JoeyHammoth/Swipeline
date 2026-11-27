@@ -25,7 +25,9 @@
   "files": [
     "dist",
     "README.md",
-    "styles.css"
+    "styles.css",
+    "LICENSE",
+    "NOTICE"
   ],
   "scripts": {
     "build": "tsup src/index.tsx --format esm,cjs --sourcemap --clean && tsc -p tsconfig.build.json && node -e \"require('node:fs').copyFileSync('dist/index.d.ts','dist/index.d.cts')\"",

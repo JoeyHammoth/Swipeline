@@ -26,6 +26,8 @@
     "examples:build": "pnpm --filter \"./examples/**\" -r run build",
     "e2e": "playwright test",
     "licenses:check": "node scripts/check-licenses.mjs",
+    "package:licenses": "node scripts/check-package-licenses.mjs",
+    "package:licenses:test": "node --test scripts/check-package-licenses.test.mjs",
     "schemas:export": "pnpm --filter @swipeline/core run schemas:export",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",

@@ -71,6 +71,12 @@ jobs:
       - name: Dependency license policy
         run: pnpm licenses:check
 
+      - name: Published packages carry LICENSE and NOTICE
+        run: pnpm package:licenses
+
+      - name: Package license checker regression tests
+        run: pnpm package:licenses:test
+
       # Second line of defence: dependency-review.yml gates what a PR adds, while
       # this audit checks the production tree that is actually installed.
       - name: Known vulnerabilities in production dependencies
