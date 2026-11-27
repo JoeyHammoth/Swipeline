@@ -19,7 +19,10 @@ concurrency:
 jobs:
   simulator:
     name: Expo smoke app on an iOS simulator
-    runs-on: macos-15
+    # `ExpoModulesJSI` ships a Swift package with tools version 6.2, which is
+    # Xcode 26 on the runners; the macOS 15 image tops out at Swift 6.1 and fails
+    # to resolve it.
+    runs-on: macos-26
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -38,6 +41,13 @@ jobs:
 
       - name: Build packages
         run: pnpm build
+
+      - name: Use the newest Xcode on the image
+        run: |
+          NEWEST=$(ls -d /Applications/Xcode*.app 2>/dev/null | sort -V | tail -1)
+          if [ -n "$NEWEST" ]; then sudo xcode-select -s "$NEWEST"; fi
+          xcodebuild -version
+          swift --version
 
       - name: Generate the native project
         working-directory: examples/books-expo
