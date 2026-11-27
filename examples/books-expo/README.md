@@ -10,13 +10,18 @@ pnpm build                     # the binding ships compiled output
 pnpm --filter swipeline-example-books-expo dev
 ```
 
-`pnpm examples:build` bundles both platforms with `expo export`. Bundling proves
-the app compiles for iOS and Android. `.github/workflows/android.yml` goes
-further on Android: it prebuilds the native project, assembles the release APK,
-installs it on an emulator, launches it and fails unless the screen reports the
-like (`scripts/android-smoke.sh`). That job is weekly and on demand, since it
-needs a Gradle build and an emulator boot. **iOS has not been run** — no
-simulator run exists for it yet.
+`pnpm examples:build` bundles both platforms with `expo export`. Two workflows go
+further, weekly and on demand because each needs a native build and a device
+runtime:
+
+- `.github/workflows/android.yml` prebuilds, assembles the release APK, installs
+  it on an emulator and fails unless `uiautomator` sees the like on screen
+  (`scripts/android-smoke.sh`).
+- `.github/workflows/ios.yml` prebuilds, builds a Release app with `xcodebuild`,
+  installs it on an iPhone simulator and reads `Documents/smoke.txt` from the app
+  container (`scripts/ios-smoke.sh`) — a release build's `console.log` never
+  reaches the simulator log, so the app writes its result to that file as well as
+  to the screen.
 
 The deck is a local fixture rather than the shared `examples/shared/decks.ts`
 factory, so a smoke result never depends on a remote API. The rest of the example

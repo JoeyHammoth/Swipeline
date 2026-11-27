@@ -106,13 +106,19 @@ confirm the like reached the event log) and prints the result on screen. That
 script is unit-tested in Node, and `pnpm examples:build` bundles the app for iOS
 and Android with `expo export`, so the app is known to compile for both platforms.
 
-`.github/workflows/android.yml` runs it for real on Android, weekly and on
-demand: `expo prebuild` generates the native project, Gradle assembles the
-release APK (debug signing), the APK installs on an API 34 x86_64 emulator, the
-activity launches, and `examples/books-expo/scripts/android-smoke.sh` fails the
-job unless `uiautomator` sees the like on screen. Green on 2026-11-27.
+Two workflows run it for real, weekly and on demand:
 
-**iOS has not been run**, and no screen reader has been attached on either
-platform, so layout as a person sees it, platform announcements and iOS
-behaviour are still unverified. See [Binding status](/reference/binding-status)
-and the [accessibility audit](/reference/a11y-audit).
+- `android.yml` prebuilds, assembles the release APK (debug signing), installs it
+  on an API 34 x86_64 emulator, launches the activity, and fails unless
+  `uiautomator` sees the like on screen.
+- `ios.yml` prebuilds, builds a Release app with `xcodebuild` on macOS 26 (the
+  Swift 6.2 that `ExpoModulesJSI` needs), boots an iPhone simulator, installs and
+  launches. A release build's `console.log` never reaches the simulator log, so
+  the app writes its result into its own Documents directory and the job reads it
+  with `simctl get_app_container`.
+
+Both green on 2026-11-27 — the iOS run reported `pass: liked "Project Hail
+Mary"`. No screen reader has been attached on either platform, so announcements
+and layout as a person sees it are still unverified. See
+[Binding status](/reference/binding-status) and the
+[accessibility audit](/reference/a11y-audit).

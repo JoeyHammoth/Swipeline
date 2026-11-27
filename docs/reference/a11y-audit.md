@@ -10,7 +10,7 @@ This page records results from a run, not intentions.
 | Binding fixture pages (`/react.html`, `/element.html`, `/vue.html`, `/svelte.html`) | Yes | axe + the audit suite + binding conformance | Not done |
 | Card templates (`text`, `media`, `facts`) as rendered by the bindings | Yes, through the fixtures | axe + conformance | Not done |
 | Example apps (`books-react`, `recipes-react`, `movies-tmdb`, `papers-html`) | Yes, nightly | axe via `pnpm e2e:examples` | Not done |
-| React Native (`examples/books-expo`) | Android, weekly | launches and reports its like (`android.yml`); no axe | Not done |
+| React Native (`examples/books-expo`) | Android and iOS, weekly | launches and reports its like (`android.yml`, `ios.yml`); no axe | Not done |
 
 ## Automated results
 
@@ -129,9 +129,10 @@ Each item is unverified until someone with the tool records the result here.
 - **AAA.** No AAA axe rules are run (sign language, extended audio). Text
   contrast is measured directly against the AAA threshold instead — see
   [Token contrast](#token-contrast) — but a themed palette is not measured.
-- **The native deck is not scanned.** `android.yml` shows that the React Native
-  deck launches and swipes on an Android emulator; no axe-equivalent check runs
-  against it, and iOS has not been run.
+- **The native deck is not scanned.** `android.yml` and `ios.yml` show that the
+  React Native deck launches and swipes on an Android emulator and an iOS
+  simulator; no axe-equivalent check runs against it, and neither platform has
+  had a screen reader attached.
 - **Hydration.** Server-rendered markup is not compared against the hydrated tree,
   so a mismatch that reorders focusable elements would not be caught.
 - **Assistive technology.** Everything in the manual checklist above is still
