@@ -1,6 +1,6 @@
 {
   "name": "create-swipeline",
-  "version": "0.0.0",
+  "version": "0.3.0",
   "description": "Scaffold a Swipeline deck: blank, books, papers, recipes or products.",
   "license": "Apache-2.0",
   "type": "module",

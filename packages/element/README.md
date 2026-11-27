@@ -12,13 +12,18 @@ deck.store = createEngine({ deckId: 'books', actor: 'reader', source })
 deck.addEventListener('swipe', (event) => console.log(event.detail))
 ```
 
-- Properties: `store` (`DeckStore`), `renderCard(card)`, `actions`.
-- Attributes: `label`, `reduced-motion`.
-- Events: `swipe` (`{ action, cardId }`) and `undo`, both bubbling and composed.
-- Styling: CSS custom properties (`--swl-accent`, `--swl-radius`, `--swl-gap`,
-  `--swl-duration`) and `::part(card|actions|button|live)`.
-- Custom cards: either the `renderCard` property or a light-DOM child with
-  `slot="card"`, which replaces the default template.
+- Properties: `store` (`DeckStore`), `renderCard(card)`, `actions`, `template`,
+  `messages`.
+- Attributes: `label`, `template` (`text`, `media`, `facts`), `reduced-motion`.
+- Events: `swipe` (`{ action, cardId }`), `undo` and `error` (an unknown
+  `template`), all bubbling and composed.
+- Styling: the `@swipeline/theme` tokens (`--swl-color-bg`, `--swl-space-…`) with
+  the 0.1-era `--swl-accent`, `--swl-radius`, `--swl-gap` and `--swl-duration`
+  still honoured, plus `::part(card|actions|button|live)`.
+- Custom cards: `renderCard` for markup built from the card, or a light-DOM child
+  with `slot="card"` for static markup.
+- Text: `messages` takes a partial catalog from `@swipeline/i18n`; anything it
+  omits falls back to English.
 - Accessibility: `role="application"`, arrow keys, `u` to undo, a polite live
   region, visible focus and reduced-motion support.
 

@@ -91,6 +91,7 @@ export default defineConfig({
           { text: 'CLI', link: '/reference/cli' },
           { text: 'Schemas', link: '/reference/schemas' },
           { text: 'Theming', link: '/reference/theming' },
+          { text: 'Strings and locales', link: '/reference/i18n' },
           { text: 'API reference', link: '/reference/api' },
           { text: 'Binding status', link: '/reference/binding-status' },
           { text: 'Contracts', link: '/architecture/contracts' },

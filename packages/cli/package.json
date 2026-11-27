@@ -1,6 +1,6 @@
 {
   "name": "@swipeline/cli",
-  "version": "0.0.0",
+  "version": "0.3.0",
   "description": "The swipeline command: serve the HTTP API, validate, export and import a history, run the benchmark.",
   "license": "Apache-2.0",
   "type": "module",

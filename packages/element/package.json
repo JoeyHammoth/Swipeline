@@ -1,6 +1,6 @@
 {
   "name": "@swipeline/element",
-  "version": "0.0.0",
+  "version": "0.3.0",
   "description": "Web Component binding for Swipeline decks: <swipe-deck>, DOM events and CSS parts.",
   "license": "Apache-2.0",
   "type": "module",
@@ -33,8 +33,11 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@swipeline/cards": "workspace:*",
     "@swipeline/core": "workspace:*",
-    "@swipeline/gestures": "workspace:*"
+    "@swipeline/gestures": "workspace:*",
+    "@swipeline/i18n": "workspace:*",
+    "@swipeline/theme": "workspace:*"
   },
   "engines": {
     "node": ">=24"

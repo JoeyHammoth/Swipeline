@@ -1,6 +1,6 @@
 {
   "name": "@swipeline/react",
-  "version": "0.0.0",
+  "version": "0.3.0",
   "description": "React binding for Swipeline decks: SwipeDeck, useDeck, keyboard and live regions.",
   "license": "Apache-2.0",
   "type": "module",
@@ -35,8 +35,10 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@swipeline/cards": "workspace:*",
     "@swipeline/core": "workspace:*",
-    "@swipeline/gestures": "workspace:*"
+    "@swipeline/gestures": "workspace:*",
+    "@swipeline/i18n": "workspace:*"
   },
   "peerDependencies": {
     "react": ">=18"

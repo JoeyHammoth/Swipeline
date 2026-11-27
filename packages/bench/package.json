@@ -1,6 +1,6 @@
 {
   "name": "@swipeline/bench",
-  "version": "0.0.0",
+  "version": "0.3.0",
   "description": "Synthetic-user benchmark harness for Swipeline ranking pipelines.",
   "license": "Apache-2.0",
   "type": "module",

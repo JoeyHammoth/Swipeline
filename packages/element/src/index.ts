@@ -1,3 +1,4 @@
+import { type CardTemplate, cardView, isCardTemplate } from '@swipeline/cards'
 import type { Card, DeckSnapshot, DeckStore, SwipeAction } from '@swipeline/core'
 import {
   actionButtons,
@@ -6,42 +7,51 @@ import {
   keyIntent,
   type SwipeDirection,
 } from '@swipeline/gestures'
+import { createTranslator, formatNumber, type Messages, type Translator } from '@swipeline/i18n'
+import { lightTheme } from '@swipeline/theme'
 
 const HTMLElementBase = (
   typeof HTMLElement === 'undefined' ? class {} : HTMLElement
 ) as typeof HTMLElement
 
+// Colours are written as `var(--swl-color-bg, #ffffff)`; the legacy single-purpose
+// variables (`--swl-accent`, `--swl-radius`, `--swl-gap`, `--swl-duration`) stay
+// first in the fallback chain so 0.1-era overrides keep working.
+function tokenNameFor(name: 'bg' | 'fg' | 'muted' | 'border' | 'accent'): string {
+  return `--swl-color-${name}`
+}
+
 const STYLES = `
   :host {
-    --swl-accent: #2563eb;
-    --swl-radius: 16px;
-    --swl-gap: 0.75rem;
-    --swl-duration: 220ms;
+    contain: layout style;
     display: block;
     font-family: system-ui, sans-serif;
-    color: #111827;
+    color: var(${tokenNameFor('fg')}, ${lightTheme['color-fg']});
   }
   :host([hidden]) { display: none; }
   .swl-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
   .swl-card {
-    border: 1px solid #e5e7eb;
-    border-radius: var(--swl-radius);
-    padding: 1rem;
+    border: 1px solid var(${tokenNameFor('border')}, ${lightTheme['color-border']});
+    border-radius: var(--swl-radius, var(--swl-radius-card, ${lightTheme['radius-card']}));
+    padding: var(--swl-space-4, ${lightTheme['space-4']});
     min-height: 12rem;
-    background: #fff;
+    background: var(${tokenNameFor('bg')}, ${lightTheme['color-bg']});
     transform: translate(var(--swl-drag-x, 0), var(--swl-drag-y, 0)) rotate(var(--swl-drag-rotate, 0deg));
-    transition: transform var(--swl-duration) ease-out;
+    transition: transform var(--swl-duration, var(--swl-motion-slow, ${lightTheme['motion-slow']})) ease-out;
     touch-action: pan-y;
   }
-  .swl-card img { width: 100%; max-height: 18rem; object-fit: cover; border-radius: calc(var(--swl-radius) / 2); }
+  .swl-card img { width: 100%; max-height: 18rem; object-fit: cover; border-radius: calc(var(--swl-radius-card, ${lightTheme['radius-card']}) / 2); }
   .swl-title { margin: 0 0 0.25rem; font-size: 1.25rem; }
-  .swl-subtitle { margin: 0 0 0.5rem; color: #4b5563; }
-  .swl-tags { display: flex; gap: 0.25rem; flex-wrap: wrap; padding: 0; list-style: none; }
-  .swl-tags li { background: #f3f4f6; border-radius: 999px; padding: 0.1rem 0.5rem; font-size: 0.75rem; }
-  .swl-actions { display: flex; gap: var(--swl-gap); flex-wrap: wrap; margin-top: 0.75rem; }
-  button { border: 1px solid #d1d5db; background: #fff; border-radius: 999px; padding: 0.4rem 0.9rem; font: inherit; cursor: pointer; }
-  button[data-action="like"] { border-color: var(--swl-accent); color: var(--swl-accent); }
-  button:focus-visible, :host(:focus-visible) .swl-card { outline: 2px solid var(--swl-accent); outline-offset: 2px; }
+  .swl-subtitle { margin: 0 0 0.5rem; color: var(${tokenNameFor('muted')}, ${lightTheme['color-muted']}); }
+  .swl-tags { display: flex; gap: var(--swl-space-1, ${lightTheme['space-1']}); flex-wrap: wrap; padding: 0; list-style: none; }
+  .swl-tags li { background: #f3f4f6; border-radius: var(--swl-radius-control, ${lightTheme['radius-control']}); padding: 0.1rem var(--swl-space-2, ${lightTheme['space-2']}); font-size: 0.75rem; }
+  .swl-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr)); gap: var(--swl-space-3, ${lightTheme['space-3']}); margin: var(--swl-space-3, ${lightTheme['space-3']}) 0 0; }
+  .swl-facts dt { font-size: 0.75rem; color: var(${tokenNameFor('muted')}, ${lightTheme['color-muted']}); }
+  .swl-facts dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .swl-actions { display: flex; gap: var(--swl-gap, var(--swl-space-3, ${lightTheme['space-3']})); flex-wrap: wrap; margin-top: var(--swl-space-3, ${lightTheme['space-3']}); }
+  button { border: 1px solid var(--swl-color-border, ${lightTheme['color-border']}); background: var(${tokenNameFor('bg')}, ${lightTheme['color-bg']}); color: inherit; border-radius: var(--swl-radius-control, ${lightTheme['radius-control']}); padding: 0.4rem 0.9rem; font: inherit; cursor: pointer; }
+  button[data-action="like"] { border-color: var(--swl-accent, var(--swl-color-accent, ${lightTheme['color-accent']})); color: var(--swl-accent, var(--swl-color-accent, ${lightTheme['color-accent']})); }
+  button:focus-visible, :host(:focus-visible) .swl-card { outline: 2px solid var(--swl-accent, var(--swl-color-accent, ${lightTheme['color-accent']})); outline-offset: 2px; }
   @media (prefers-reduced-motion: reduce) {
     .swl-card { transition-duration: 0ms; transform: none !important; }
   }
@@ -61,13 +71,14 @@ function element<K extends keyof HTMLElementTagNameMap>(
 /**
  * `<swipe-deck>` — the framework-free reference binding.
  *
- * Properties: `store` (a `DeckStore`), `renderCard(card)` and the `label` /
- * `reduced-motion` attributes. Emits `swipe` and `undo` DOM events, renders
- * into open shadow DOM with `part`s, and uses slots for a custom card template.
+ * Properties: `store` (a `DeckStore`), `renderCard(card)`, `actions`, `template`
+ * and `messages`. Attributes: `label`, `template`, `reduced-motion`. Emits `swipe`
+ * and `undo` DOM events, renders into open shadow DOM with `part`s, and uses a
+ * `card` slot for a fully custom template.
  */
 export class SwipeDeckElement extends HTMLElementBase {
   static get observedAttributes(): string[] {
-    return ['label', 'reduced-motion']
+    return ['label', 'template', 'reduced-motion']
   }
 
   #store: DeckStore | undefined
@@ -75,6 +86,9 @@ export class SwipeDeckElement extends HTMLElementBase {
   #controller: GestureController | undefined
   #actions: Partial<Record<SwipeDirection, SwipeAction>> | undefined
   #renderCard: ((card: Card) => Node) | undefined
+  #template: CardTemplate = 'media'
+  #messages: Messages | undefined
+  #translator: Translator = createTranslator()
   #lastPosition = 0
   #connected = false
 
@@ -113,6 +127,28 @@ export class SwipeDeckElement extends HTMLElementBase {
     return this.#renderCard
   }
 
+  /** The built-in template used when no `renderCard` is set. */
+  set template(template: CardTemplate) {
+    this.#template = template
+    if (this.getAttribute('template') !== template) this.setAttribute('template', template)
+    this.render()
+  }
+
+  get template(): CardTemplate {
+    return this.#template
+  }
+
+  /** A partial catalog; anything it omits falls back to English. */
+  set messages(messages: Messages | undefined) {
+    this.#messages = messages
+    this.#translator = createTranslator(messages ?? {})
+    this.render()
+  }
+
+  get messages(): Messages | undefined {
+    return this.#messages
+  }
+
   get snapshot(): DeckSnapshot | undefined {
     return this.#store?.getSnapshot()
   }
@@ -121,7 +157,8 @@ export class SwipeDeckElement extends HTMLElementBase {
     this.#connected = true
     if (!this.hasAttribute('tabindex')) this.tabIndex = 0
     this.setAttribute('role', 'application')
-    if (!this.hasAttribute('label')) this.setAttribute('aria-label', 'Swipe deck')
+    if (!this.hasAttribute('label'))
+      this.setAttribute('aria-label', this.#translator.t('deck.label'))
     this.addEventListener('keydown', this.#onKeyDown)
     this.#subscribe()
     this.render()
@@ -136,9 +173,29 @@ export class SwipeDeckElement extends HTMLElementBase {
     this.#controller = undefined
   }
 
-  attributeChangedCallback(name: string): void {
-    if (name === 'label')
-      this.setAttribute('aria-label', this.getAttribute('label') ?? 'Swipe deck')
+  attributeChangedCallback(name: string, _old: string | null, value: string | null): void {
+    if (name === 'label') {
+      this.setAttribute('aria-label', value ?? this.#translator.t('deck.label'))
+      return
+    }
+    if (name === 'template') {
+      if (value !== null && isCardTemplate(value)) this.#template = value
+      else if (value !== null) {
+        // An unknown template is a configuration error, not a silent fallback.
+        this.dispatchEvent(
+          new CustomEvent('error', {
+            detail: new TypeError(
+              `Unknown card template "${value}". Use one of: text, media, facts.`,
+            ),
+            bubbles: true,
+            composed: true,
+          }),
+        )
+        return
+      }
+      this.render()
+      return
+    }
     if (name === 'reduced-motion') this.render()
   }
 
@@ -187,6 +244,7 @@ export class SwipeDeckElement extends HTMLElementBase {
     const root = this.shadowRoot
     if (!root) return
     const snapshot = this.#store?.getSnapshot()
+    const t = this.#translator
     this.#controller?.destroy()
     this.#controller = undefined
     root.replaceChildren()
@@ -199,7 +257,12 @@ export class SwipeDeckElement extends HTMLElementBase {
     live.setAttribute('aria-live', 'polite')
     live.setAttribute('aria-atomic', 'true')
     const current = snapshot?.cards[0]
-    if (current) live.textContent = `${current.title}, card ${(snapshot?.position ?? 0) + 1}`
+    if (current) {
+      live.textContent = t.t('deck.announce', {
+        title: current.title,
+        position: (snapshot?.position ?? 0) + 1,
+      })
+    }
     root.append(live)
 
     const card = element('div', 'swl-card')
@@ -224,13 +287,15 @@ export class SwipeDeckElement extends HTMLElementBase {
     root.append(card)
 
     const state = snapshot?.state
-    if (state === 'loading' && !current) root.append(element('p', 'swl-status', 'Loading cards…'))
+    if (state === 'loading' && !current) {
+      root.append(element('p', 'swl-status', t.t('deck.loading')))
+    }
     if (state === 'error') {
       const alert = element('div', 'swl-error')
       alert.setAttribute('role', 'alert')
-      alert.textContent = snapshot?.lastError?.message ?? 'Could not load cards.'
+      alert.textContent = snapshot?.lastError?.message ?? t.t('error.load')
       if (snapshot?.lastError?.retryable) {
-        const retry = element('button', 'swl-retry', 'Retry')
+        const retry = element('button', 'swl-retry', t.t('deck.retry'))
         retry.type = 'button'
         retry.addEventListener('click', () => this.#store?.dispatch({ type: 'retry' }))
         alert.append(retry)
@@ -238,16 +303,12 @@ export class SwipeDeckElement extends HTMLElementBase {
       root.append(alert)
     }
     if (state === 'offline') {
-      const status = element(
-        'p',
-        'swl-status',
-        'You are offline. Loaded cards are still available.',
-      )
+      const status = element('p', 'swl-status', t.t('deck.offline'))
       status.setAttribute('role', 'status')
       root.append(status)
     }
     if (snapshot && !current && state !== 'loading' && state !== 'error' && state !== 'offline') {
-      const empty = element('p', 'swl-status', 'No more cards.')
+      const empty = element('p', 'swl-status', t.t('deck.empty'))
       empty.setAttribute('role', 'status')
       root.append(empty)
     }
@@ -255,20 +316,26 @@ export class SwipeDeckElement extends HTMLElementBase {
     const actions = element('div', 'swl-actions')
     actions.setAttribute('part', 'actions')
     for (const button of actionButtons(this.#actions ? { actions: this.#actions } : {})) {
-      const control = element('button', 'swl-action', button.label)
+      const label = t.t(`actions.${button.action}`)
+      const control = element('button', 'swl-action', label)
       control.type = 'button'
       control.dataset.action = button.action
       control.setAttribute('part', 'button')
-      control.setAttribute('aria-label', button.ariaLabel)
+      control.setAttribute(
+        'aria-label',
+        label === button.label
+          ? button.ariaLabel
+          : `${label} (${button.shortcut.replace('Arrow', '')})`,
+      )
       control.disabled = !current
       control.addEventListener('click', () => this.commit(button.action))
       actions.append(control)
     }
-    const undo = element('button', 'swl-action', 'Undo')
+    const undo = element('button', 'swl-action', t.t('deck.undo'))
     undo.type = 'button'
     undo.dataset.action = 'undo'
     undo.setAttribute('part', 'button')
-    undo.setAttribute('aria-label', 'Undo last swipe (U)')
+    undo.setAttribute('aria-label', t.t('deck.undoAria'))
     undo.disabled = !snapshot?.canUndo
     undo.addEventListener('click', () => this.undo())
     actions.append(undo)
@@ -281,21 +348,41 @@ export class SwipeDeckElement extends HTMLElementBase {
   }
 
   #defaultCard(card: Card): HTMLElement {
+    const t = this.#translator
+    const view = cardView(card, this.#template)
     const wrapper = element('div', 'swl-default')
-    const cover = card.media?.find((media) => media.kind === 'image')
-    if (cover) {
+    const cover = view.media?.[0]
+    if (cover && cover.kind === 'image') {
       const image = document.createElement('img')
       image.src = cover.url
       image.alt = cover.alt ?? ''
+      image.loading = 'lazy'
       wrapper.append(image)
     }
-    wrapper.append(element('h2', 'swl-title', card.title))
-    if (card.subtitle) wrapper.append(element('p', 'swl-subtitle', card.subtitle))
-    if (card.body) wrapper.append(element('p', 'swl-body', card.body))
-    if (card.tags && card.tags.length > 0) {
+    wrapper.append(element('h2', 'swl-title', view.title))
+    if (view.subtitle) {
+      wrapper.append(element('p', 'swl-subtitle', view.subtitle))
+    }
+    if (view.facts && view.facts.length > 0) {
+      const list = element('dl', 'swl-facts')
+      list.setAttribute('aria-label', t.t('deck.facts'))
+      for (const fact of view.facts) {
+        const group = element('div', 'swl-fact')
+        group.append(element('dt', '', fact.label))
+        const value =
+          typeof fact.value === 'number' ? formatNumber(fact.value, t.locale) : fact.value
+        group.append(element('dd', '', fact.unit ? `${value} ${fact.unit}` : value))
+        list.append(group)
+      }
+      wrapper.append(list)
+    }
+    if (view.body) {
+      wrapper.append(element('p', 'swl-body', view.body))
+    }
+    if (view.tags && view.tags.length > 0) {
       const list = element('ul', 'swl-tags')
-      list.setAttribute('aria-label', 'Tags')
-      for (const tag of card.tags) list.append(element('li', '', tag))
+      list.setAttribute('aria-label', t.t('deck.tags'))
+      for (const tag of view.tags) list.append(element('li', '', tag))
       wrapper.append(list)
     }
     if (card.attribution) {

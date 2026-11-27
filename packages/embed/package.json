@@ -1,6 +1,6 @@
 {
   "name": "@swipeline/embed",
-  "version": "0.0.0",
+  "version": "0.3.0",
   "description": "Optional embedding providers for Swipeline ranking: OpenAI-compatible endpoints and Transformers.js.",
   "license": "Apache-2.0",
   "type": "module",

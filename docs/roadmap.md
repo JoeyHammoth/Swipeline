@@ -53,7 +53,7 @@ deck, no framework imports outside binding packages, playground v0 live.
 - Acceptance: default pipeline beats random and popularity baselines by the
   documented margin; React and the Web Component pass conformance; SSR smoke passes
 
-## M3 — v0.3: server and CLI
+## M3 — v0.3: server and CLI · [release notes](releases/0.3.0)
 
 - [x] `server` core: `GET /health`, validated idempotent `POST /events`, `GET /export/:actor`, `DELETE /actors/:actor`, auth hook and CORS
 - [x] `server` storage: SQLite (`store-sqlite`, `node:sqlite`) and Postgres
@@ -77,9 +77,12 @@ deck, no framework imports outside binding packages, playground v0 live.
 
 ## M4 — v0.5: mobile and breadth
 
-- `react-native` binding, thin `vue` and `svelte` bindings
-- OpenAPI specification for the server; theming kit; i18n catalog
-- Adapter registry and docs catalog; `facts` card template; accessibility audit
+- [ ] `react-native` binding, thin `vue` and `svelte` bindings
+- [ ] Adapter registry and docs catalog; accessibility audit
+- [x] OpenAPI specification for the server (`GET /openapi.json`)
+- [x] Theming kit: `@swipeline/theme` with both palettes and CSS output
+- [x] i18n catalog: `@swipeline/i18n`, wired into both bindings
+- [x] `facts` card template: `@swipeline/cards`, used by React and the Web Component
 - Acceptance: Expo demo on iOS and Android; Vue and Svelte pass conformance; one
   `deck.config.ts` runs everywhere
 

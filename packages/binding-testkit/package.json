@@ -1,6 +1,6 @@
 {
   "name": "@swipeline/binding-testkit",
-  "version": "0.0.0",
+  "version": "0.3.0",
   "description": "Binding conformance suite for Swipeline: keyboard, buttons, undo, a11y and lifecycle.",
   "license": "Apache-2.0",
   "type": "module",

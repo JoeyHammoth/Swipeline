@@ -15,6 +15,9 @@ list; see [`docs/architecture/overview.md`](../docs/architecture/overview.md).
 | `element` | M2 | `<swipe-deck>` Web Component, the reference binding |
 | `react` | M1 | React binding over `core` + `gestures` |
 | `binding-testkit` | M2 | Conformance suite every binding must pass |
+| `cards` | M4 | Built-in card templates: `text`, `media`, `facts` |
+| `theme` | M4 | Design tokens, light and dark palettes, CSS output |
+| `i18n` | M4 | Message catalog and translator for binding strings |
 | `react-native` | M4 | React Native / Expo binding |
 | `vue`, `svelte` | M4 | Thin first-party bindings |
 | `embed` | M2 | Transformers.js, OpenAI-compatible and Ollama embedders |

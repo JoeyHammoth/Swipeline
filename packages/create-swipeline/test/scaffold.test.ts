@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -35,7 +36,13 @@ describe('scaffold', () => {
       dependencies: Record<string, string>
     }
     expect(pkg.name).toBe('swipeline-books')
-    expect(pkg.dependencies['@swipeline/react']).toBe('^0.0.0')
+    // Scaffolded projects target the current workspace release, not a stale pin.
+    const coreVersion = (
+      JSON.parse(readFileSync(new URL('../../core/package.json', import.meta.url), 'utf8')) as {
+        version: string
+      }
+    ).version
+    expect(pkg.dependencies['@swipeline/react']).toBe(`^${coreVersion}`)
     expect(pkg.dependencies.react).toBe('^19.3.1')
 
     const entry = await readFile(join(root, 'src/main.tsx'), 'utf8')

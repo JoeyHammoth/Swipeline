@@ -3,8 +3,11 @@
   "compilerOptions": {
     "types": [],
     "paths": {
+      "@swipeline/cards": ["../../packages/cards/src/index.ts"],
       "@swipeline/core": ["../../packages/core/src/index.ts"],
       "@swipeline/gestures": ["../../packages/gestures/src/index.ts"],
+      "@swipeline/i18n": ["../../packages/i18n/src/index.ts"],
+      "@swipeline/theme": ["../../packages/theme/src/index.ts"],
       "@swipeline/adapter-testkit": ["../../packages/adapter-testkit/src/index.ts"],
       "@swipeline/adapter-http-json": ["../../packages/adapter-http-json/src/index.ts"],
       "@swipeline/store-memory": ["../../packages/store-memory/src/index.ts"],

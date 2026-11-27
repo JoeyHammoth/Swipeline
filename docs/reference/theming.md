@@ -3,6 +3,29 @@
 Bindings share one token vocabulary. Override the tokens on the deck element or
 on `:root`; React and the Web Component consume the same names.
 
+## The theme package
+
+```ts
+import { darkTheme, lightTheme, mergeTheme, themeCss } from '@swipeline/theme'
+
+const style = document.createElement('style')
+style.textContent = themeCss() // light, dark via media query, data-theme overrides
+document.head.append(style)
+
+const brand = mergeTheme(lightTheme, { 'color-accent': '#db2777' })
+```
+
+- `TOKEN_NAMES`, `lightTheme`, `darkTheme` — one vocabulary, two palettes.
+- `mergeTheme(base, overrides)` — validated overrides. An unknown token name or a
+  value that could close the declaration (`;`, `{`, `}`, `<`) throws instead of
+  rendering something wrong, because a theme can come from stored user settings.
+- `themeCss()` — the full stylesheet; explicit `data-theme` blocks come last, so
+  they beat the media query in both directions.
+- `tokenValue(name, theme)` — `var(--swl-color-bg, #ffffff)`, which is how the
+  element still renders with no stylesheet loaded.
+
+The package is inert: importing it touches no DOM and no globals.
+
 ## Tokens
 
 | Token | Purpose | Light | Dark |
@@ -65,6 +88,19 @@ internals for layout changes that tokens cannot express. React accepts a
 
 Bindings also stop writing transforms when `prefers-reduced-motion` matches, so
 setting durations to zero is a fallback, not the only mechanism.
+
+## How the element uses tokens
+
+`<swipe-deck>` writes every rule as `var(--swl-…, <light value>)`, so a stylesheet
+is optional and an override always wins. The 0.1-era variables (`--swl-accent`,
+`--swl-radius`, `--swl-gap`, `--swl-duration`) stay first in the fallback chain:
+
+```css
+.my-deck {
+  --swl-accent: #db2777; /* still works */
+  --swl-color-accent: #db2777; /* preferred */
+}
+```
 
 ## RTL
 

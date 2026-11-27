@@ -13,8 +13,18 @@ a fixed order. Real products usually want their own markup.
 | `compare` | side-by-side comparisons (later) | two cards |
 
 ```tsx
-<SwipeDeck deck={books} template="facts" />
+<SwipeDeck store={books} template="facts" />
 ```
+
+```html
+<swipe-deck template="facts"></swipe-deck>
+```
+
+The template decides *which fields* render, not how they look; both bindings read
+the same selection from `cardView(card, template)` in `@swipeline/cards`, so a deck
+looks the same in React and the Web Component. An unknown template is an error: it
+throws in `cardView`, and the element emits an `error` event and keeps the previous
+template.
 
 ## React: render prop
 
@@ -45,23 +55,28 @@ a fixed order. Real products usually want their own markup.
 />
 ```
 
-## Web Component: slots
+## Web Component: renderer or slot
 
-```html
-<swipe-deck deck-id="books" query="science fiction">
-  <template slot="card">
-    <article class="my-card">
-      <h2 data-field="title"></h2>
-      <p data-field="subtitle"></p>
-      <img data-field="image" alt="" />
-      <p data-field="body"></p>
-    </article>
-  </template>
-</swipe-deck>
+The element takes a renderer when the markup needs card data:
+
+```ts
+const deck = document.querySelector('swipe-deck')
+deck.renderCard = (card) => {
+  const article = document.createElement('article')
+  article.className = 'my-card'
+  const heading = document.createElement('h2')
+  heading.textContent = card.title
+  article.append(heading)
+  return article
+}
 ```
 
-The element fills `data-field` nodes from the current card. Styling goes through
-CSS custom properties and `::part()`; see the [theming reference](/reference/theming).
+A light-DOM child with `slot="card"` replaces the default template with static
+markup, as a slot normally does — it is not filled in per card. Use `renderCard`
+when the content depends on the card.
+
+Styling goes through CSS custom properties and the `card`, `actions` and `button`
+parts; see the [theming reference](/reference/theming).
 
 ## Rules that keep templates portable
 

@@ -64,7 +64,8 @@ export interface ScaffoldResult {
   files: readonly string[]
 }
 
-const VERSION = '^0.0.0'
+/** The release line the templates target; `scaffold.test.ts` keeps it in step with the packages. */
+const VERSION = '^0.3.0'
 
 /** Placeholder the generator replaces with a version or `workspace:*`. */
 const V = '__SWIPELINE__'

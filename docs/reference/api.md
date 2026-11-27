@@ -98,6 +98,18 @@ Binding conformance suite for Swipeline: keyboard, buttons, undo, a11y and lifec
 | `BindingHandle` | interface |  |
 | `BindingReport` | interface |  |
 
+## `@swipeline/cards`
+
+Framework-free card templates: which fields of a Card a template shows, in order.
+
+| Symbol | Kind | Summary |
+| --- | --- | --- |
+| `CARD_TEMPLATES` | const | Built-in card templates. A template decides *which* fields a card shows, not |
+| `CardTemplate` | type |  |
+| `cardView` | function | The fields a template shows, in render order. Attribution is always carried |
+| `CardView` | interface | The subset of a card one template renders, ready for a view layer. |
+| `isCardTemplate` | function |  |
+
 ## `@swipeline/cli`
 
 The swipeline command: serve the HTTP API, validate, export and import a history, run the benchmark.
@@ -249,6 +261,21 @@ Framework-free pointer, keyboard and reduced-motion controller for Swipeline dec
 | `SwipeIntentOptions` | interface |  |
 | `swipeProgress` | function | 0–1 progress toward the commit threshold, for transform and opacity CSS. |
 
+## `@swipeline/i18n`
+
+Message catalogs for the UI binding strings, with fallback, interpolation and number formatting.
+
+| Symbol | Kind | Summary |
+| --- | --- | --- |
+| `createTranslator` | function |  |
+| `en` | const |  |
+| `formatMessage` | function | Substitutes `{name}` placeholders. A placeholder with no matching parameter is |
+| `formatNumber` | function | Formats a number in the translator's locale. Kept here so a binding renders |
+| `MessageParams` | type |  |
+| `Messages` | type | Every string a binding renders itself, in one catalog. Cards are user data and |
+| `Translator` | interface |  |
+| `TranslatorOptions` | interface |  |
+
 ## `@swipeline/rank`
 
 Ranking stages, default pipeline and explanations for Swipeline decks.
@@ -375,6 +402,25 @@ SQLite-backed Swipeline stores for Node, Bun and the CLI (node:sqlite, no native
 | `createSqliteStores` | function |  |
 | `SqliteStoreOptions` | interface |  |
 | `SqliteStores` | interface |  |
+
+## `@swipeline/theme`
+
+The shared design-token vocabulary: light and dark palettes, CSS variables and overflow-safe overrides.
+
+| Symbol | Kind | Summary |
+| --- | --- | --- |
+| `cssVar` | function | The custom property a token maps to, e.g. `--swl-color-bg`. |
+| `darkTheme` | const |  |
+| `declarations` | function | The declarations of one theme, without a selector. |
+| `lightTheme` | const |  |
+| `mergeTheme` | function | Applies overrides on top of a base theme. Unknown token names are an error |
+| `Theme` | type |  |
+| `themeCss` | function | A complete stylesheet: the light palette, the dark palette under |
+| `ThemeCssOptions` | interface |  |
+| `themeToCss` | function | One theme as a rule, for a stylesheet or a shadow root. |
+| `TOKEN_NAMES` | const | The token vocabulary every binding shares. Values live here so a brand can |
+| `TokenName` | type |  |
+| `tokenValue` | function | A `var()` reference with the theme's value as the fallback, so a binding still |
 
 ## `@swipeline/vector`
 
