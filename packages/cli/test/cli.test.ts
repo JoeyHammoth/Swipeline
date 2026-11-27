@@ -186,7 +186,9 @@ describe('swipeline export', () => {
     const captured = capture()
     expect(await run(['export', path], captured.io)).toBe(0)
 
-    expect(captured.out.map((line) => (JSON.parse(line) as SwipeEvent).cardId)).toEqual([
+    // Events come back in ULID order, which two ids created in the same
+    // millisecond do not necessarily share with insertion order.
+    expect(captured.out.map((line) => (JSON.parse(line) as SwipeEvent).cardId).sort()).toEqual([
       'books:1',
       'books:2',
     ])
