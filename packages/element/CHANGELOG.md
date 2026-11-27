@@ -1,5 +1,21 @@
 # @swipeline/element
 
+## 0.4.1
+
+### Patch Changes
+
+- 2101bb9: Give the Web Component's status and error blocks the palette's own background and foreground, so dark-text-on-dark-page is no longer possible when the element is embedded in a dark page. Found by the example-app accessibility audit.
+- 6e91914: Tag pills are drawn from the palette instead of a fixed light grey, which left
+  the tag text inherited from a dark page on a near-white pill, and both packages'
+  `var()` fallbacks carry the new palette values so a deck without a stylesheet
+  matches the theme.
+- Updated dependencies [6e91914]
+  - @swipeline/theme@0.4.1
+  - @swipeline/cards@0.4.1
+  - @swipeline/core@0.4.1
+  - @swipeline/gestures@0.4.1
+  - @swipeline/i18n@0.4.1
+
 ## 0.4.0
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@swipeline/vector",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Brute-force and SQLite-vec vector indexes behind one small interface.",
   "license": "Apache-2.0",
   "type": "module",

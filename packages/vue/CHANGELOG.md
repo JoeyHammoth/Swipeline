@@ -1,5 +1,14 @@
 # @swipeline/vue
 
+## 0.4.1
+
+### Patch Changes
+
+- @swipeline/cards@0.4.1
+  - @swipeline/core@0.4.1
+  - @swipeline/gestures@0.4.1
+  - @swipeline/i18n@0.4.1
+
 ## 0.4.0
 
 ### Minor Changes

@@ -1,5 +1,19 @@
 # @swipeline/react
 
+## 0.4.1
+
+### Patch Changes
+
+- 2101bb9: Mark the preview card `inert` as well as `aria-hidden`, so a custom card's links and buttons no longer stay in the tab order. Found by the example-app accessibility audit (`aria-hidden-focus`).
+- 6e91914: Tag pills are drawn from the palette instead of a fixed light grey, which left
+  the tag text inherited from a dark page on a near-white pill, and both packages'
+  `var()` fallbacks carry the new palette values so a deck without a stylesheet
+  matches the theme.
+- @swipeline/cards@0.4.1
+  - @swipeline/core@0.4.1
+  - @swipeline/gestures@0.4.1
+  - @swipeline/i18n@0.4.1
+
 ## 0.4.0
 
 ### Patch Changes

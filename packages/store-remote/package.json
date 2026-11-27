@@ -1,6 +1,6 @@
 {
   "name": "@swipeline/store-remote",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "HTTP event store and outbox sync against @swipeline/server.",
   "license": "Apache-2.0",
   "type": "module",

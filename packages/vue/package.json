@@ -1,6 +1,6 @@
 {
   "name": "@swipeline/vue",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Vue binding for Swipeline decks: SwipeDeck, keyboard and live regions.",
   "license": "Apache-2.0",
   "type": "module",

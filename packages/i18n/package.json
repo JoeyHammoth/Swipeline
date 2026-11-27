@@ -1,6 +1,6 @@
 {
   "name": "@swipeline/i18n",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Message catalogs for the UI binding strings, with fallback, interpolation and number formatting.",
   "license": "Apache-2.0",
   "type": "module",

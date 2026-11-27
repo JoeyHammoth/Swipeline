@@ -40,6 +40,7 @@ changes require a major and at least one minor release of deprecation warnings.
 
 | Version | Notes |
 |---|---|
+| 0.4.1 | [A palette that passes, and the deck running in CI](/releases/0.4.1) |
 | 0.4.0 | [Vue, Svelte and React Native bindings](/releases/0.4.0) |
 | 0.3.0 | [Server, CLI and the M3 surface](/releases/0.3.0) |
 

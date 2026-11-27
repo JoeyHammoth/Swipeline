@@ -1,6 +1,6 @@
 {
   "name": "@swipeline/adapter-http-json",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Declarative HTTP/JSON source adapter for Swipeline: mapping, pagination, retries.",
   "license": "Apache-2.0",
   "type": "module",

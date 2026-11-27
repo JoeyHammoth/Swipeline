@@ -1,5 +1,11 @@
 # @swipeline/store-postgres
 
+## 0.4.1
+
+### Patch Changes
+
+- @swipeline/core@0.4.1
+
 ## 0.4.0
 
 ### Patch Changes
