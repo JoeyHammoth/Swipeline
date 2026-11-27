@@ -106,8 +106,13 @@ confirm the like reached the event log) and prints the result on screen. That
 script is unit-tested in Node, and `pnpm examples:build` bundles the app for iOS
 and Android with `expo export`, so the app is known to compile for both platforms.
 
-It has **not** been launched on a device, simulator or emulator, so layout, real
-touch input and platform announcements are still unverified. Treat the native
-half as unconfirmed until that run exists. See
-[Binding status](/reference/binding-status) and the
-[accessibility audit](/reference/a11y-audit).
+`.github/workflows/android.yml` runs it for real on Android, weekly and on
+demand: `expo prebuild` generates the native project, Gradle assembles the
+release APK (debug signing), the APK installs on an API 34 x86_64 emulator, the
+activity launches, and `examples/books-expo/scripts/android-smoke.sh` fails the
+job unless `uiautomator` sees the like on screen. Green on 2026-11-27.
+
+**iOS has not been run**, and no screen reader has been attached on either
+platform, so layout as a person sees it, platform announcements and iOS
+behaviour are still unverified. See [Binding status](/reference/binding-status)
+and the [accessibility audit](/reference/a11y-audit).

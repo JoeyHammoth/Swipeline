@@ -9,7 +9,7 @@ test results in this repository, not intentions.
 | Web Component | `@swipeline/element` | Official — passing | [`packages/element/test/element.test.ts`](https://github.com/JoeyHammoth/Swipeline/blob/main/packages/element/test/element.test.ts) | Chromium |
 | Vue 3 | `@swipeline/vue` | Official — passing | [`packages/vue/test/conformance.test.ts`](https://github.com/JoeyHammoth/Swipeline/blob/main/packages/vue/test/conformance.test.ts) | Chromium |
 | Svelte 5 | `@swipeline/svelte` | Official — passing | [`packages/svelte/test/conformance.test.ts`](https://github.com/JoeyHammoth/Swipeline/blob/main/packages/svelte/test/conformance.test.ts) | Chromium |
-| React Native / Expo | `@swipeline/react-native` | Official — not device-verified | [`packages/react-native/test/swipe-deck.test.tsx`](https://github.com/JoeyHammoth/Swipeline/blob/main/packages/react-native/test/swipe-deck.test.tsx) (mocked React Native surface) | — |
+| React Native / Expo | `@swipeline/react-native` | Official — Android emulator; iOS unrun | [`packages/react-native/test/swipe-deck.test.tsx`](https://github.com/JoeyHammoth/Swipeline/blob/main/packages/react-native/test/swipe-deck.test.tsx) (mocked React Native surface) | Android emulator, weekly |
 | Solid, Angular | — | Planned | — | — |
 
 Every binding passes the same seven behaviours through `assertBindingConformance`:
@@ -32,8 +32,8 @@ lockfile, plus nightly and on demand. The jsdom suites run in `ci.yml` on every 
 ## What is still not covered
 
 - **Full WCAG coverage.** axe runs with the `wcag2a` and `wcag2aa` tags on every
-  fixture page. AAA rules, the example apps and real assistive-technology passes
-  are not covered.
+  fixture page, and the four example decks are scanned nightly. AAA rules and
+  real assistive-technology passes are not covered.
 - **Hydration equality.** `packages/react/test/ssr.test.tsx` proves the React
   binding renders on the server without a DOM; it does not compare a hydrated tree
   against the server markup.
@@ -42,9 +42,12 @@ lockfile, plus nightly and on demand. The jsdom suites run in `ci.yml` on every 
 - **React Native.** The binding has no jsdom or browser suite: React Native is
   Flow source that Node cannot load, so its render tests run against a mocked
   `react-native` module, and the drag itself is covered only through
-  `intentFromGesture` unit tests. `examples/books-expo` bundles for iOS and
-  Android and its scripted swipe is unit-tested, but nothing in this repository
-  has launched it on a device, simulator or emulator.
+  `intentFromGesture` unit tests. `examples/books-expo` is exercised on an Android
+  emulator by `android.yml` (weekly and on demand): the release APK installs,
+  launches and reports the scripted swipe's like on screen, checked by
+  `examples/books-expo/scripts/android-smoke.sh`. Green on 2026-11-27. **iOS has
+  never been run**, no screen reader has been attached, and a layout seen by a
+  person is still missing.
 
 ## Adding a row
 

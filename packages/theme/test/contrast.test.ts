@@ -7,7 +7,7 @@ function luminance(hex: string): number {
     .replace('#', '')
     .match(/../g)
     ?.map((pair) => Number.parseInt(pair, 16) / 255)
-  if (!channels || channels.length !== 3) throw new Error(`Not a #rrggbb colour: ${hex}`)
+  if (channels?.length !== 3) throw new Error(`Not a #rrggbb colour: ${hex}`)
   const [r, g, b] = channels.map((channel) =>
     channel <= 0.03928 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4,
   ) as [number, number, number]

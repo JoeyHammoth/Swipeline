@@ -11,8 +11,12 @@ pnpm --filter swipeline-example-books-expo dev
 ```
 
 `pnpm examples:build` bundles both platforms with `expo export`. Bundling proves
-the app compiles for iOS and Android; it does **not** run it — a device or
-simulator is still needed to see the deck, and that run is manual.
+the app compiles for iOS and Android. `.github/workflows/android.yml` goes
+further on Android: it prebuilds the native project, assembles the release APK,
+installs it on an emulator, launches it and fails unless the screen reports the
+like (`scripts/android-smoke.sh`). That job is weekly and on demand, since it
+needs a Gradle build and an emulator boot. **iOS has not been run** — no
+simulator run exists for it yet.
 
 The deck is a local fixture rather than the shared `examples/shared/decks.ts`
 factory, so a smoke result never depends on a remote API. The rest of the example

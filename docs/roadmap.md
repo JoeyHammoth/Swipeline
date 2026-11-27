@@ -79,9 +79,10 @@ deck, no framework imports outside binding packages, playground v0 live.
 
 - [x] `vue` binding, passing the shared conformance suite in jsdom and Chromium
 - [x] thin `svelte` binding, passing the shared conformance suite in jsdom and Chromium
-- [ ] `react-native` binding — implemented and bundled for iOS and Android by
-  the Expo smoke app (`examples/books-expo`); not yet launched on a device,
-  simulator or emulator
+- [ ] `react-native` binding — implemented, bundled for iOS and Android by the
+  Expo smoke app (`examples/books-expo`), and run on an Android emulator by
+  `android.yml` (weekly: the APK installs, launches and reports a scripted
+  swipe's like). iOS has not been run on a simulator.
 - [x] Adapter registry: schema-validated, with a generated docs catalog
 - [ ] Accessibility audit — automated axe (WCAG 2.0/2.1/2.2, A/AA), the
   keyboard, reflow, target-size, forced-colours and reduced-motion checks, the
