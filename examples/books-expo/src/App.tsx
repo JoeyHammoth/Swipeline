@@ -13,10 +13,16 @@ export default function App() {
     let cancelled = false
     runScriptedSwipe(deck)
       .then((result) => {
-        if (!cancelled) setSmoke(result)
+        if (cancelled) return
+        setSmoke(result)
+        // The iOS workflow reads this from the simulator log, where `console.log`
+        // lands; the Android one greps the screen instead.
+        console.log(`[swipeline-smoke] ${result.ok ? 'pass' : 'fail'}: ${result.detail}`)
       })
       .catch((cause: unknown) => {
-        if (!cancelled) setSmoke({ ok: false, detail: String(cause) })
+        if (cancelled) return
+        setSmoke({ ok: false, detail: String(cause) })
+        console.log(`[swipeline-smoke] fail: ${String(cause)}`)
       })
     return () => {
       cancelled = true
