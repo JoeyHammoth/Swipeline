@@ -7,7 +7,7 @@ import { expect, test } from '@playwright/test'
  * and shadow-DOM behaviour is certified rather than simulated. axe then checks the
  * same page against the WCAG A and AA rules.
  */
-const FIXTURES = ['react', 'element'] as const
+const FIXTURES = ['react', 'element', 'vue'] as const
 
 for (const name of FIXTURES) {
   test(`${name} binding passes the conformance suite in Chromium`, async ({ page }) => {

@@ -1,37 +1,41 @@
 # Adapters catalog
 
 A source adapter turns one API, file or database into [`Card`s](/concepts/cards-and-adapters).
-This page is generated from
-[`registry/adapters.json`](https://github.com/JoeyHammoth/Swipeline/blob/main/registry/adapters.json).
+The table below is generated from
+[`registry/adapters.json`](https://github.com/JoeyHammoth/Swipeline/blob/main/registry/adapters.json)
+by `node scripts/check-registry.mjs --write`; `pnpm registry:check` fails when it
+drifts.
 
-## First-party (in this repository)
+<!-- registry:start -->
+| Adapter | API | License | Attribution | Conformance |
+|---|---|---|---|---|
+| [`@swipeline/adapter-openlibrary`](https://github.com/JoeyHammoth/Swipeline/tree/main/packages/adapter-openlibrary) | openlibrary.org | Apache-2.0 | Required | passing |
+| [`@swipeline/adapter-themealdb`](https://github.com/JoeyHammoth/Swipeline/tree/main/packages/adapter-themealdb) | themealdb.com | Apache-2.0 | Required | passing |
+| [`@swipeline/adapter-arxiv`](https://github.com/JoeyHammoth/Swipeline/tree/main/packages/adapter-arxiv) | info.arxiv.org | Apache-2.0 | Required | passing |
+| [`@swipeline/adapter-tmdb`](https://github.com/JoeyHammoth/Swipeline/tree/main/packages/adapter-tmdb) | developer.themoviedb.org | Apache-2.0 | Required | passing |
+<!-- registry:end -->
 
-| Adapter | Source | Milestone | Attribution |
-|---|---|---|---|
-| `swipeline-adapter-arxiv` | arXiv API | M2 | Required by arXiv terms; cite the paper |
-| `swipeline-adapter-openlibrary` | Open Library search | M2 | Data from Open Library |
-| `swipeline-adapter-themealdb` | TheMealDB | M2 | TheMealDB free tier terms |
-| `swipeline-adapter-tmdb` | TMDB | M2 | "This product uses the TMDB API but is not endorsed or certified by TMDB" |
+The first-party adapters live in this repository. They are chosen because they
+have documented terms, stable endpoints and clear attribution rules — not because
+they are the most popular sources.
 
-These are chosen because they have documented terms, stable endpoints and clear
-attribution rules — not because they are the most popular sources.
+## Adding an adapter
 
-## Community adapters
-
-Nothing listed yet. The registry ships with an empty `adapters` array and a schema
-([`registry/schema.json`](https://github.com/JoeyHammoth/Swipeline/blob/main/registry/schema.json)).
-
-To be listed:
-
-1. Publish a package named `swipeline-adapter-<name>` with the `swipeline-adapter`
-   keyword and a permissive license.
-2. Pass the adapter conformance suite (M2) with recorded fixtures.
+1. Implement a `SourceAdapter` and test it against recorded fixtures — see
+   [Write a source adapter](/guides/write-an-adapter). Live calls in tests are
+   rejected in review, because CI cannot depend on a third party.
+2. Publish a package named `swipeline-adapter-<name>` with the
+   `swipeline-adapter` keyword and a permissive license.
 3. Declare `attribution`, rate limits and caching rules in the package README.
 4. Open a PR that adds one entry to `registry/adapters.json`. CI validates the
-   schema, the license and that the package exists.
+   entry against [`registry/schema.json`](https://github.com/JoeyHammoth/Swipeline/blob/main/registry/schema.json),
+   checks a first-party entry against the package it names, and regenerates the
+   table above.
 
-Listing is a convenience, not an endorsement. Entries show maintainers, license,
-terms URL and last publish date so users can judge for themselves.
+`conformance: "passing"` is reserved for adapters whose conformance suite runs in
+this repository; a third-party entry has to say `"unknown"` until that changes.
+Listing is a convenience, not an endorsement — read the maintainers, license and
+terms URL before relying on one.
 
 ## What "conformance" means
 

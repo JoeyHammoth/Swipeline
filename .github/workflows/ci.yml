@@ -77,6 +77,12 @@ jobs:
       - name: Package license checker regression tests
         run: pnpm package:licenses:test
 
+      - name: Adapter registry is valid and the catalog matches it
+        run: pnpm registry:check
+
+      - name: Registry checker regression tests
+        run: pnpm registry:test
+
       # Second line of defence: dependency-review.yml gates what a PR adds, while
       # this audit checks the production tree that is actually installed.
       - name: Known vulnerabilities in production dependencies

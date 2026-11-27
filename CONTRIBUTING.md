@@ -13,7 +13,10 @@ By participating you agree to the [Code of Conduct](CODE_OF_CONDUCT.md).
 - **One change per pull request.** Keep it reviewable; squash merges keep
   `main` linear.
 - **A changeset for every user-facing change.** Run `pnpm changeset` and commit
-  the generated file. Docs-only and CI-only changes do not need one.
+  the generated file. Docs-only and CI-only changes do not need one. A release
+  commit on `main` has none by design — it consumes them — so
+  `pnpm changeset:status` reports "no changesets were found" there. That error is
+  expected on a release commit and nowhere else.
 - **Schema and API changes need an RFC.** Anything that changes `Card`,
   `SwipeEvent`, `Profile`, a published interface or the `DeckStore` contract
   starts as a PR against `rfcs/`.
@@ -55,9 +58,9 @@ Useful scripts:
 | Path | Contents |
 |---|---|
 | `packages/core` | Schemas, types, config and the headless deck engine |
-| `packages/*` | Workspace packages (17 total): `core`, `rank`, `embed`, `vector`, `store-memory`, `store-indexeddb`, `gestures`, `element`, `react`, `binding-testkit`, `bench`, `adapter-http-json`, `adapter-testkit`, `adapter-arxiv`, `adapter-openlibrary`, `adapter-themealdb`, `adapter-tmdb` |
+| `packages/*` | Workspace packages (see [`packages/README.md`](packages/README.md) for the full list and what each one owns) |
 | `adapters/` | Compatibility pointer to first-party adapter packages in `packages/adapter-*` |
-| `registry/adapters.json` | Index of community adapters rendered by the docs site |
+| `registry/adapters.json` | Index of adapters; `pnpm registry:check` validates it and keeps the docs catalog in step |
 | `docs/` | VitePress pages, ADRs (`docs/adr`), research notes (`docs/research`), architecture (`docs/architecture`) |
 | `rfcs/` | Design proposals |
 

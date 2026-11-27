@@ -11,7 +11,11 @@ export default defineConfig({
   // One fixture page per binding; Playwright opens them by name.
   build: {
     rollupOptions: {
-      input: { react: page('./react.html'), element: page('./element.html') },
+      input: {
+        react: page('./react.html'),
+        element: page('./element.html'),
+        vue: page('./vue.html'),
+      },
     },
   },
 })

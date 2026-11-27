@@ -13,9 +13,13 @@ export const workspaceAliases: Record<string, string> = {
   '@swipeline/adapter-themealdb': source('../packages/adapter-themealdb/src/index.ts'),
   '@swipeline/adapter-tmdb': source('../packages/adapter-tmdb/src/index.ts'),
   '@swipeline/binding-testkit': source('../packages/binding-testkit/src/index.ts'),
+  '@swipeline/cards': source('../packages/cards/src/index.ts'),
   '@swipeline/core': source('../packages/core/src/index.ts'),
   '@swipeline/element': source('../packages/element/src/index.ts'),
   '@swipeline/gestures': source('../packages/gestures/src/index.ts'),
+  '@swipeline/i18n': source('../packages/i18n/src/index.ts'),
+  '@swipeline/theme': source('../packages/theme/src/index.ts'),
+  '@swipeline/vue': source('../packages/vue/src/index.ts'),
   // Longest key first: Vite aliases match by prefix, so the stylesheet must be
   // listed before the package root that would otherwise resolve it as a subpath.
   '@swipeline/react/styles.css': source('../packages/react/styles.css'),

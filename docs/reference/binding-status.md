@@ -7,7 +7,8 @@ test results in this repository, not intentions.
 |---|---|---|---|---|
 | React | `@swipeline/react` | Official — passing | [`packages/react/test/conformance.test.tsx`](https://github.com/JoeyHammoth/Swipeline/blob/main/packages/react/test/conformance.test.tsx) | Chromium |
 | Web Component | `@swipeline/element` | Official — passing | [`packages/element/test/element.test.ts`](https://github.com/JoeyHammoth/Swipeline/blob/main/packages/element/test/element.test.ts) | Chromium |
-| Vue, Svelte, Solid, Angular | — | Planned (M4) | — | — |
+| Vue 3 | `@swipeline/vue` | Official — passing | [`packages/vue/test/conformance.test.ts`](https://github.com/JoeyHammoth/Swipeline/blob/main/packages/vue/test/conformance.test.ts) | Chromium |
+| Svelte, Solid, Angular | — | Planned (M4) | — | — |
 | React Native / Expo | — | Planned (M4) | — | — |
 
 Both bindings pass the same seven behaviours through `assertBindingConformance`:
@@ -19,7 +20,7 @@ reports every failure in one `BindingConformanceError`.
 ## How the browser run works
 
 `e2e.yml` starts the fixture app in `examples/conformance`, which has one page per
-binding (`/react.html`, `/element.html`). Each page mounts its binding and exposes
+binding (`/react.html`, `/element.html`, `/vue.html`). Each page mounts its binding and exposes
 `window.__swipelineConformance`, and `e2e/binding-conformance.spec.ts` calls it in
 Chromium, asserting `{ binding, checks: 7 }` and that the page threw nothing.
 

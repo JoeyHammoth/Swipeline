@@ -21,6 +21,7 @@ export default defineConfig({
       '@swipeline/cards': source('./packages/cards/src/index.ts'),
       '@swipeline/theme': source('./packages/theme/src/index.ts'),
       '@swipeline/i18n': source('./packages/i18n/src/index.ts'),
+      '@swipeline/vue': source('./packages/vue/src/index.ts'),
       '@swipeline/core': source('./packages/core/src/index.ts'),
       '@swipeline/server': source('./packages/server/src/index.ts'),
       '@swipeline/cli': source('./packages/cli/src/index.ts'),

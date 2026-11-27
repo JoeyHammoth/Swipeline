@@ -439,3 +439,11 @@ Brute-force and SQLite-vec vector indexes behind one small interface.
 | `VectorEntry` | interface |  |
 | `VectorIndex` | interface | The index contract. Implementations may be exact (brute force) or backed by a |
 | `VectorMatch` | interface |  |
+
+## `@swipeline/vue`
+
+Vue binding for Swipeline decks: SwipeDeck, keyboard and live regions.
+
+| Symbol | Kind | Summary |
+| --- | --- | --- |
+| `SwipeDeck` | const | `&lt;SwipeDeck&gt;` for Vue 3 — the same behaviour as the React binding: pointer and |

@@ -14,6 +14,7 @@ list; see [`docs/architecture/overview.md`](../docs/architecture/overview.md).
 | `gestures` | M1 | Framework-free pointer, keyboard and reduced-motion controller |
 | `element` | M2 | `<swipe-deck>` Web Component, the reference binding |
 | `react` | M1 | React binding over `core` + `gestures` |
+| `vue` | M4 | Vue 3 binding over `core` + `gestures` |
 | `binding-testkit` | M2 | Conformance suite every binding must pass |
 | `cards` | M4 | Built-in card templates: `text`, `media`, `facts` |
 | `theme` | M4 | Design tokens, light and dark palettes, CSS output |
