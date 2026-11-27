@@ -30,6 +30,16 @@ const STYLES = `
   }
   :host([hidden]) { display: none; }
   .swl-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  /* Status and error text sit outside the card, so on a dark page they would
+     inherit the light text colour on the element's own light surface. Give them
+     both the palette's background and foreground. */
+  .swl-status, .swl-error {
+    margin: 0;
+    padding: var(--swl-space-3, ${lightTheme['space-3']});
+    border-radius: var(--swl-radius-card, ${lightTheme['radius-card']});
+    background: var(${tokenNameFor('bg')}, ${lightTheme['color-bg']});
+    color: var(${tokenNameFor('fg')}, ${lightTheme['color-fg']});
+  }
   .swl-card {
     border: 1px solid var(${tokenNameFor('border')}, ${lightTheme['color-border']});
     border-radius: var(--swl-radius, var(--swl-radius-card, ${lightTheme['radius-card']}));

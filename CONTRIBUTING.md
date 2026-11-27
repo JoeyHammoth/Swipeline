@@ -53,6 +53,7 @@ Useful scripts:
 | `pnpm licenses:check` | Dependency license policy, for the published packages |
 | `pnpm package:licenses` | Published packages carry `LICENSE` and `NOTICE` |
 | `pnpm e2e` | Binding conformance in Chromium (see below) |
+| `pnpm e2e:examples` | axe over the four example decks (nightly in CI) |
 | `pnpm docs:dev` / `pnpm docs:build` | VitePress site |
 | `pnpm changeset` | Record a user-facing change |
 

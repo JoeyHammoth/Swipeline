@@ -167,7 +167,14 @@ export function SwipeDeck({
       ) : null}
 
       {preview ? (
-        <div className="swl-preview" aria-hidden="true" data-testid="swl-preview-card">
+        <div
+          className="swl-preview"
+          aria-hidden="true"
+          // `inert` keeps a custom card's links and buttons out of the tab order;
+          // aria-hidden alone still lets them take focus.
+          inert
+          data-testid="swl-preview-card"
+        >
           {renderCard ? (
             renderCard(preview)
           ) : (

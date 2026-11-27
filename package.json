@@ -25,6 +25,7 @@
     "examples:typecheck": "pnpm --filter \"./examples/**\" -r run typecheck",
     "examples:build": "pnpm --filter \"./examples/**\" -r run build",
     "e2e": "playwright test",
+    "e2e:examples": "playwright test --config playwright.examples.config.ts",
     "licenses:check": "node scripts/check-licenses.mjs",
     "package:licenses": "node scripts/check-package-licenses.mjs",
     "package:licenses:test": "node --test scripts/check-package-licenses.test.mjs",

@@ -5,6 +5,8 @@ const HOST = '127.0.0.1'
 
 export default defineConfig({
   testDir: './e2e',
+  // The example decks have their own config and servers (`pnpm e2e:examples`).
+  testIgnore: ['examples/**'],
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,

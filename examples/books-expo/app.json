@@ -6,6 +6,12 @@
     "orientation": "portrait",
     "platforms": ["ios", "android"],
     "newArchEnabled": true,
+    "android": {
+      "package": "dev.swipeline.expo"
+    },
+    "ios": {
+      "bundleIdentifier": "dev.swipeline.expo"
+    },
     "experiments": {
       "tsconfigPaths": false
     }
