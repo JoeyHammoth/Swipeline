@@ -1,4 +1,5 @@
 import { SwipeDeck } from '@swipeline/react-native'
+import { File, Paths } from 'expo-file-system'
 import { useEffect, useState } from 'react'
 import { SafeAreaView, StyleSheet, Text, useColorScheme, View } from 'react-native'
 import { createSmokeDeck } from './deck'
@@ -15,14 +16,13 @@ export default function App() {
       .then((result) => {
         if (cancelled) return
         setSmoke(result)
-        // The iOS workflow reads this from the simulator log, where `console.log`
-        // lands; the Android one greps the screen instead.
-        console.log(`[swipeline-smoke] ${result.ok ? 'pass' : 'fail'}: ${result.detail}`)
+        report(result)
       })
       .catch((cause: unknown) => {
         if (cancelled) return
-        setSmoke({ ok: false, detail: String(cause) })
-        console.log(`[swipeline-smoke] fail: ${String(cause)}`)
+        const result = { ok: false, detail: String(cause) }
+        setSmoke(result)
+        report(result)
       })
     return () => {
       cancelled = true
@@ -48,6 +48,20 @@ export default function App() {
       </View>
     </SafeAreaView>
   )
+}
+
+/**
+ * Records the result in the app's own container as well as on screen. The iOS
+ * workflow cannot read pixels, and a release build's `console.log` never reaches
+ * the simulator log, so it reads this file with `simctl get_app_container`. The
+ * Android workflow greps the screen instead.
+ */
+function report(result: SmokeResult): void {
+  try {
+    new File(Paths.document, 'smoke.txt').write(`${result.ok ? 'pass' : 'fail'}: ${result.detail}`)
+  } catch {
+    // A failed write must not change what the screen shows.
+  }
 }
 
 const styles = StyleSheet.create({

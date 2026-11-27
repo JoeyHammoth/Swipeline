@@ -6,7 +6,6 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 BUNDLE_ID="dev.swipeline.expo"
-MARKER="[swipeline-smoke] pass"
 
 UDID=$(xcrun simctl list devices available -j |
   jq -r '[.devices[][] | select(.name | startswith("iPhone"))] | .[0].udid')
@@ -64,34 +63,31 @@ echo "App: $APP"
 xcrun simctl boot "$UDID" 2>/dev/null || true
 xcrun simctl bootstatus "$UDID" -b
 xcrun simctl install "$UDID" "$APP"
-
-# The app reports through `console.log`, which reaches the simulator log rather
-# than the process stdout, so listen for the line instead of tailing the process.
-xcrun simctl spawn "$UDID" log stream --style compact \
-  --predicate 'eventMessage CONTAINS "swipeline-smoke"' > sim.log 2>&1 &
-STREAM_PID=$!
-trap 'kill "$STREAM_PID" 2>/dev/null || true' EXIT
-sleep 3
-
 xcrun simctl launch "$UDID" "$BUNDLE_ID"
 
+# The app writes its result into its own container, which the host can read:
+# pixels are not readable here and a release build's `console.log` never reaches
+# the simulator log.
+CONTAINER=$(xcrun simctl get_app_container "$UDID" "$BUNDLE_ID" data)
+RESULT="$CONTAINER/Documents/smoke.txt"
 for _ in $(seq 1 24); do
-  if grep -qF "$MARKER" sim.log; then
-    echo "The app reported:"
-    grep -F "$MARKER" sim.log
-    exit 0
-  fi
-  if grep -qF "[swipeline-smoke] fail" sim.log; then
-    echo "::error::the deck failed its scripted swipe"
-    grep -F "[swipeline-smoke]" sim.log
-    exit 1
+  if [ -f "$RESULT" ]; then
+    case "$(cat "$RESULT")" in
+      pass*)
+        echo "The app reported: $(cat "$RESULT")"
+        exit 0
+        ;;
+      fail*)
+        echo "::error::the deck failed its scripted swipe: $(cat "$RESULT")"
+        exit 1
+        ;;
+    esac
   fi
   sleep 5
 done
 
-echo "--- simulator log"
-cat sim.log
-xcrun simctl spawn "$UDID" log show --last 3m --style compact \
-  --predicate 'process == "Swipelinesbooks"' 2>/dev/null | tail -40 || true
+echo "--- app log"
+xcrun simctl spawn "$UDID" log show --last 2m --style compact \
+  --predicate 'process CONTAINS "Swipeline"' 2>/dev/null | tail -40 || true
 echo "::error::the app never reported a like"
 exit 1
