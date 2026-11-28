@@ -77,6 +77,15 @@ jobs:
       - name: Package license checker regression tests
         run: pnpm package:licenses:test
 
+      # The publish itself needs a credential, but npm's own validation and the
+      # tarball contents do not: this proves every package would be accepted by
+      # the registry once it has one.
+      - name: Packages are ready to publish
+        run: pnpm publish:check
+
+      - name: Publish checker regression tests
+        run: pnpm publish:check:test
+
       - name: Adapter registry is valid and the catalog matches it
         run: pnpm registry:check
 

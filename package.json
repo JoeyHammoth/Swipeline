@@ -29,6 +29,8 @@
     "licenses:check": "node scripts/check-licenses.mjs",
     "package:licenses": "node scripts/check-package-licenses.mjs",
     "package:licenses:test": "node --test scripts/check-package-licenses.test.mjs",
+    "publish:check": "node scripts/check-publish.mjs",
+    "publish:check:test": "node --test scripts/check-publish.test.mjs",
     "registry:check": "node scripts/check-registry.mjs",
     "registry:catalog": "node scripts/check-registry.mjs --write",
     "registry:test": "node --test scripts/check-registry.test.mjs",
