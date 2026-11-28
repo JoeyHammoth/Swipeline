@@ -68,6 +68,41 @@ xcrun simctl launch "$UDID" "$BUNDLE_ID"
 # The app writes its result into its own container, which the host can read:
 # pixels are not readable here and a release build's `console.log` never reaches
 # the simulator log.
+# What iOS offers an assistive technology. `expo prebuild` generates a project
+# with no UI test target, so one is added (scripts/add-uitest-target.rb) and the
+# test reads the accessibility tree, printing the labels VoiceOver would be
+# handed. VoiceOver itself is not driven here — the spoken pass is manual, see
+# docs/reference/a11y-manual-script.md.
+accessibility_tree() {
+  if ! ruby -e "require 'xcodeproj'" >/dev/null 2>&1; then
+    echo "xcodeproj is not on this ruby; installing it for the current user"
+    gem install xcodeproj --no-document --user-install --quiet
+  fi
+
+  ruby scripts/add-uitest-target.rb
+
+  if ! xcodebuild test \
+    -workspace "$WORKSPACE" \
+    -scheme "SwipelineSmokeUITests" \
+    -configuration Release \
+    -sdk iphonesimulator \
+    -destination "id=$UDID" \
+    -derivedDataPath ios/build \
+    CODE_SIGNING_ALLOWED=NO \
+    > ios-uitest.log 2>&1; then
+    echo "--- ui test failures"
+    grep -E "error:|XCTAssert|Test Case .* failed" -A 3 ios-uitest.log | sed -n 1,80p
+    echo "--- tail"
+    tail -20 ios-uitest.log
+    echo "::error::the iOS deck failed its accessibility-tree check"
+    exit 1
+  fi
+
+  echo "--- accessibility tree"
+  grep -E "Accessibility tree:|^ *- " ios-uitest.log | sed -n 1,20p || true
+  return 0
+}
+
 CONTAINER=$(xcrun simctl get_app_container "$UDID" "$BUNDLE_ID" data)
 RESULT="$CONTAINER/Documents/smoke.txt"
 for _ in $(seq 1 24); do
@@ -75,6 +110,7 @@ for _ in $(seq 1 24); do
     case "$(cat "$RESULT")" in
       pass*)
         echo "The app reported: $(cat "$RESULT")"
+        accessibility_tree
         exit 0
         ;;
       fail*)
