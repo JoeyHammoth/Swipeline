@@ -3,7 +3,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import test from 'node:test'
-import { advertisedPaths, checkPublishReadiness } from './check-publish.mjs'
+import { advertisedPaths, checkPublished, checkPublishReadiness } from './check-publish.mjs'
 
 /** A throwaway repository root holding one empty `packages` directory. */
 function fixture() {
@@ -190,6 +190,53 @@ test('skips private packages', () => {
 
     assert.equal(packagesChecked, 0)
     assert.deepEqual(problems, [])
+  })
+})
+
+test('registry check passes when every package version resolves', () => {
+  withFixture((root) => {
+    addPackage(root, 'a', { name: '@swipeline/a' })
+    addPackage(root, 'b', { name: '@swipeline/b', version: '2.0.0' })
+
+    const asked = []
+    const { packagesChecked, versions, problems } = checkPublished(root, {
+      lookup: (name, version) => {
+        asked.push(`${name}@${version}`)
+        return 'published'
+      },
+    })
+
+    assert.deepEqual(problems, [])
+    assert.equal(packagesChecked, 2)
+    assert.deepEqual(versions, ['1.0.0', '2.0.0'])
+    assert.deepEqual(asked.sort(), ['@swipeline/a@1.0.0', '@swipeline/b@2.0.0'])
+  })
+})
+
+test('registry check names every package missing from the registry', () => {
+  withFixture((root) => {
+    addPackage(root, 'a', { name: '@swipeline/a' })
+    addPackage(root, 'b', { name: '@swipeline/b' })
+
+    const { problems } = checkPublished(root, {
+      lookup: (name) => (name === '@swipeline/b' ? 'missing' : 'published'),
+    })
+
+    assert.deepEqual(problems, ['@swipeline/b@1.0.0: not on the registry'])
+  })
+})
+
+test('registry check reports a lookup that failed for another reason', () => {
+  withFixture((root) => {
+    addPackage(root, 'a', { name: '@swipeline/a' })
+
+    const { problems } = checkPublished(root, {
+      lookup: () => ({ error: 'npm error E500 registry unavailable' }),
+    })
+
+    assert.deepEqual(problems, [
+      '@swipeline/a@1.0.0: registry lookup failed (npm error E500 registry unavailable)',
+    ])
   })
 })
 

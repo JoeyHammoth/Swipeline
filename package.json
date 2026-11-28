@@ -30,6 +30,7 @@
     "package:licenses": "node scripts/check-package-licenses.mjs",
     "package:licenses:test": "node --test scripts/check-package-licenses.test.mjs",
     "publish:check": "node scripts/check-publish.mjs",
+    "publish:check:registry": "node scripts/check-publish.mjs --registry",
     "publish:check:test": "node --test scripts/check-publish.test.mjs",
     "registry:check": "node scripts/check-registry.mjs",
     "registry:catalog": "node scripts/check-registry.mjs --write",

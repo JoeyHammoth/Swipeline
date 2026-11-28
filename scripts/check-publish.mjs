@@ -6,7 +6,12 @@
  * manifest advertises is actually inside the tarball npm would upload. Nothing
  * here contacts the registry, so it runs on every pull request.
  *
- * Usage: pnpm publish:check
+ * `--registry` is the other half of the proof: it asks npm directly whether each
+ * package's manifest version resolves. Nothing is on the registry before the
+ * first publish, so this mode runs after a publish rather than on a pull
+ * request, and a partially published release fails it.
+ *
+ * Usage: pnpm publish:check [--registry]
  */
 import { execFileSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
@@ -45,15 +50,9 @@ export function advertisedPaths(pkg) {
   return [...paths]
 }
 
-/**
- * Check every public package under `<root>/packages`.
- *
- * `publish` is injectable so tests can describe a dry run without running npm;
- * the default shells out to `npm publish --dry-run`.
- */
-export function checkPublishReadiness(root, { publish = publishDryRun } = {}) {
+/** Every package manifest under `<root>/packages`, keyed by its directory. */
+export function readManifests(root) {
   const packageRoot = join(root, 'packages')
-  const problems = []
   const manifests = new Map()
 
   for (const entry of readdirSync(packageRoot, { withFileTypes: true })) {
@@ -61,8 +60,21 @@ export function checkPublishReadiness(root, { publish = publishDryRun } = {}) {
     const dir = join(packageRoot, entry.name)
     const manifest = join(dir, 'package.json')
     if (!existsSync(manifest)) continue
-    manifests.set(join(dir), JSON.parse(readFileSync(manifest, 'utf8')))
+    manifests.set(dir, JSON.parse(readFileSync(manifest, 'utf8')))
   }
+
+  return manifests
+}
+
+/**
+ * Check every public package under `<root>/packages`.
+ *
+ * `publish` is injectable so tests can describe a dry run without running npm;
+ * the default shells out to `npm publish --dry-run`.
+ */
+export function checkPublishReadiness(root, { publish = publishDryRun } = {}) {
+  const problems = []
+  const manifests = readManifests(root)
 
   const workspaceNames = new Set([...manifests.values()].map((pkg) => pkg.name))
   let packagesChecked = 0
@@ -144,7 +156,89 @@ export function publishDryRun(dir) {
   }
 }
 
+/**
+ * Ask the registry whether each public package resolves at its manifest version.
+ *
+ * `lookup` is injectable so tests never contact npm. It returns `'published'`,
+ * `'missing'`, or `{ error }` for anything else the registry said.
+ */
+export function checkPublished(root, { lookup = registryLookup } = {}) {
+  const problems = []
+  const versions = new Set()
+  let packagesChecked = 0
+
+  for (const [dir, pkg] of readManifests(root)) {
+    if (pkg.private) continue
+    packagesChecked += 1
+
+    if (!pkg.name || !pkg.version) {
+      problems.push(`${dir}: manifest has no name or version`)
+      continue
+    }
+    versions.add(pkg.version)
+
+    const result = lookup(pkg.name, pkg.version)
+    if (result === 'published') continue
+    if (result === 'missing') {
+      problems.push(`${pkg.name}@${pkg.version}: not on the registry`)
+      continue
+    }
+    problems.push(`${pkg.name}@${pkg.version}: registry lookup failed (${result.error})`)
+  }
+
+  return { packagesChecked, versions: [...versions].sort(), problems }
+}
+
+/** What npm says about one package version: published, missing, or why it failed. */
+export function registryLookup(name, version) {
+  const spec = `${name}@${version}`
+  try {
+    const raw = execFileSync('npm', ['view', spec, 'version', '--json', '--loglevel=error'], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+    })
+    const reported = JSON.parse(raw)
+    if (reported === version) return 'published'
+    return { error: `registry reports ${JSON.stringify(reported)}` }
+  } catch (error) {
+    const stderr = String(error?.stderr ?? '')
+    // npm answers E404 for a version that does not exist, which is the expected
+    // state before the first publish.
+    if (/\bE404\b/.test(stderr)) return 'missing'
+    const reason =
+      stderr
+        .split('\n')
+        .map((line) => line.trim())
+        .find((line) => /^npm (error|ERR!)/.test(line)) ?? error.message
+    return { error: reason }
+  }
+}
+
 function main() {
+  const args = process.argv.slice(2)
+  const unknown = args.filter((arg) => arg !== '--registry')
+  if (unknown.length > 0) {
+    console.error(`Unknown argument${unknown.length === 1 ? '' : 's'}: ${unknown.join(' ')}`)
+    console.error('Usage: pnpm publish:check [--registry]')
+    process.exit(2)
+  }
+
+  if (args.includes('--registry')) {
+    const { packagesChecked, versions, problems } = checkPublished(process.cwd())
+
+    if (problems.length > 0) {
+      console.error('Not every package resolves on npm at its manifest version:\n')
+      for (const problem of problems) console.error(`  ✗ ${problem}`)
+      process.exit(1)
+    }
+
+    const at = versions.length === 1 ? versions[0] : versions.join(', ')
+    console.log(
+      `Registry check passed: all ${packagesChecked} package${packagesChecked === 1 ? '' : 's'} resolve on npm at ${at}.`,
+    )
+    return
+  }
+
   const { packagesChecked, problems } = checkPublishReadiness(process.cwd())
 
   if (problems.length > 0) {
