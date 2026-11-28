@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import type { Card, DeckStore, SourceAdapter } from '@swipeline/core'
 import { createEngine } from '@swipeline/core'
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
 import { SwipeDeck, useDeck } from '../src/index.js'
 
@@ -69,6 +69,21 @@ describe('SwipeDeck', () => {
     const live = document.querySelector('.swl-live')
     expect(live?.getAttribute('aria-live')).toBe('polite')
     expect(live?.textContent).toBe('Card 0, card 1')
+  })
+
+  it('announces the card once and only when the card changes', async () => {
+    const { store } = await setup()
+    const live = document.querySelector('.swl-live')
+    expect(live?.textContent).toBe('Card 0, card 1')
+
+    fireEvent.click(screen.getByRole('button', { name: /^Like/ }))
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Card 1' })).toBeDefined())
+    expect(live?.textContent).toBe('Card 1, card 2')
+
+    // A state change that leaves the current card alone must not re-announce it.
+    act(() => store.dispatch({ type: 'setOffline', offline: true }))
+    await waitFor(() => expect(store.getSnapshot().state).toBe('offline'))
+    expect(live?.textContent).toBe('Card 1, card 2')
   })
 
   it('advances on the Like button and moves focus to the deck', async () => {

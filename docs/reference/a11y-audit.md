@@ -37,7 +37,12 @@ touch the bindings, nightly and on demand.
   consumer-side stylesheet used for the other bindings sets 44 px.
 - **Reduced motion.** A key press still advances the deck with
   `prefers-reduced-motion: reduce` emulated.
-- **Binding conformance.** 7/7 checks per binding in the same run.
+- **Announcements.** After an advance the React live region holds the new card's
+  title and position, and a state change that leaves the card in place leaves it
+  unchanged. The React Native binding calls the platform announcement API once
+  per card change and not again when it re-renders with the same card. That is
+  the call the binding makes, not what a screen reader says — the spoken result
+  is in the manual checklist below.
 
 ## Example apps (nightly)
 

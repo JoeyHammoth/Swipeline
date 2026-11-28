@@ -139,6 +139,24 @@ describe('React Native binding', () => {
     expect(AccessibilityInfo.announceForAccessibility).toHaveBeenCalledWith('First card, card 1')
   })
 
+  it('announces once per card and does not repeat it on a re-render', async () => {
+    const { store, renderer } = await mount()
+    expect(AccessibilityInfo.announceForAccessibility).toHaveBeenCalledTimes(1)
+
+    await press(renderer, store, 'swl-action-like')
+    expect(AccessibilityInfo.announceForAccessibility).toHaveBeenCalledTimes(2)
+    expect(AccessibilityInfo.announceForAccessibility).toHaveBeenLastCalledWith(
+      'Second card, card 2',
+    )
+
+    // A new catalog object rebuilds the translator and re-runs the effect; the
+    // same card must not be spoken twice.
+    await act(async () => {
+      renderer.update(<SwipeDeck store={store} messages={{}} />)
+    })
+    expect(AccessibilityInfo.announceForAccessibility).toHaveBeenCalledTimes(2)
+  })
+
   it('shows the exhausted message after the last card', async () => {
     const { store, renderer } = await mount()
     await press(renderer, store, 'swl-action-like')
