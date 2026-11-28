@@ -19,6 +19,7 @@ real trade-off. One short record each; the reasoning matters more than the forma
 | [0012](./0012-sqlite-vec-optional.md) | `sqlite-vec` is optional, never the default | Accepted |
 | [0013](./0013-web-component-reference-binding.md) | The Web Component is the reference binding, built in M2 | Accepted |
 | [0014](./0014-biome-lint-format.md) | Biome for lint and format, not ESLint + Prettier | Accepted |
+| [0015](./0015-public-api-freeze.md) | Three promise levels, and a frozen public surface | Accepted |
 
 ## Not an ADR
 

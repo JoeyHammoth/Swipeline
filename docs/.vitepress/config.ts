@@ -93,6 +93,7 @@ export default defineConfig({
           { text: 'Theming', link: '/reference/theming' },
           { text: 'Strings and locales', link: '/reference/i18n' },
           { text: 'API reference', link: '/reference/api' },
+          { text: 'API surface and promises', link: '/reference/api-surface' },
           { text: 'Binding status', link: '/reference/binding-status' },
           { text: 'Accessibility audit', link: '/reference/a11y-audit' },
           { text: 'Screen-reader script', link: '/reference/a11y-manual-script' },
