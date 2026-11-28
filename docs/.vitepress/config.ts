@@ -95,6 +95,7 @@ export default defineConfig({
           { text: 'API reference', link: '/reference/api' },
           { text: 'Binding status', link: '/reference/binding-status' },
           { text: 'Accessibility audit', link: '/reference/a11y-audit' },
+          { text: 'Screen-reader script', link: '/reference/a11y-manual-script' },
           { text: 'Contracts', link: '/architecture/contracts' },
         ],
       },

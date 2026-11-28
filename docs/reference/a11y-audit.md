@@ -99,6 +99,9 @@ border from `#3a3d63` to `#6f74a8` (1.60:1 → 3.73:1).
 ## Manual checklist
 
 Each item is unverified until someone with the tool records the result here.
+The [screen-reader script](/reference/a11y-manual-script) is this checklist
+written as steps to run, with the commands, what to listen for, and how to record
+a result.
 
 ### Screen readers
 
