@@ -36,7 +36,8 @@ work starts.
   (local run 2026-11-26; CI run `45602865428`, 2026-11-25)
 - [x] `check:boundaries` green: 19 packages, no framework imports outside bindings
 - [ ] First manual npm publish — blocked on the organisation transfer (#1) and on
-  creating the npm organisation
+  creating the npm organisation; the steps are in the
+  [first publish runbook](operations/first-publish.md)
 
 Acceptance met apart from the first publish: quickstart under ten minutes on a
 clean machine, unit and component tests pass, a11y checks pass for the default

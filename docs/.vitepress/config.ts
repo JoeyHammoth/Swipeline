@@ -109,6 +109,7 @@ export default defineConfig({
           { text: 'Landscape', link: '/landscape' },
           { text: 'Roadmap', link: '/roadmap' },
           { text: 'Organisation transfer', link: '/operations/org-transfer' },
+          { text: 'First publish', link: '/operations/first-publish' },
           { text: 'Changelog', link: '/changelog' },
         ],
       },

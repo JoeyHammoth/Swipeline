@@ -70,7 +70,8 @@ Transfers preserve most settings, but verify instead of assuming:
 - [ ] Register the trusted publisher again with the new owner/repo/workflow and
       the `npm-publish` environment. The old registration stops matching.
 - [ ] First publish of each package stays manual (trusted publishing needs an
-      existing package), then switch to OIDC and remove any token.
+      existing package) — [first publish runbook](/operations/first-publish) —
+      then switch to OIDC and remove any token.
 - [ ] Verify provenance on the first org-published release and check that the
       `repository` field in each `package.json` points at the new URL.
 - [ ] Re-run `pnpm licenses:check` and the SBOM step, if enabled.
