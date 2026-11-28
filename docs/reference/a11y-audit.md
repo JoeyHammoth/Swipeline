@@ -19,6 +19,12 @@ passing. (The bundled Chromium cannot install on this machine; CI uses
 Playwright's pinned build.) `e2e.yml` runs the same specs on pull requests that
 touch the bindings, nightly and on demand.
 
+The counts below are not transcribed by hand and left to rot: `pnpm audit:docs`
+compares this page with the specs — the axe tag set, the conformance check
+count, the number of example apps — and with the JSON report Playwright writes
+during the run, and `e2e.yml` runs it after each suite. A new test, a dropped
+tag or a skipped test fails the job until this page is updated.
+
 **axe**, with the tags `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa` and `wcag22aa`:
 
 - 0 violations on all four fixture pages in the default theme.
@@ -37,6 +43,7 @@ touch the bindings, nightly and on demand.
   consumer-side stylesheet used for the other bindings sets 44 px.
 - **Reduced motion.** A key press still advances the deck with
   `prefers-reduced-motion: reduce` emulated.
+- **Binding conformance.** 7/7 checks per binding in the same run.
 - **Announcements.** After an advance the React live region holds the new card's
   title and position, and a state change that leaves the card in place leaves it
   unchanged. The React Native binding calls the platform announcement API once

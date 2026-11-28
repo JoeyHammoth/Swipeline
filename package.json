@@ -45,6 +45,8 @@
     "api:docs": "node scripts/api-reference.mjs",
     "docs:links": "node scripts/check-docs-links.mjs",
     "docs:links:test": "node --test scripts/check-docs-links.test.mjs",
+    "audit:docs": "node scripts/check-audit-docs.mjs",
+    "audit:docs:test": "node --test scripts/check-audit-docs.test.mjs",
     "bench:gate": "vitest run packages/bench/test/bench.test.ts",
     "quickstart:verify": "node scripts/check-templates.mjs"
   },

@@ -60,6 +60,11 @@ jobs:
       - name: Binding conformance in a real browser
         run: pnpm e2e
 
+      # The audit page quotes a test count, a tag set and a conformance count.
+      # This fails when the suite and the page stop agreeing.
+      - name: Audit page matches what the suite produced
+        run: pnpm audit:docs
+
   examples:
     name: Example app accessibility
     # The example decks call live APIs and need four dev servers, so they are
@@ -90,3 +95,6 @@ jobs:
 
       - name: Example decks against the WCAG A/AA rules
         run: pnpm e2e:examples
+
+      - name: Audit page matches what the example run produced
+        run: pnpm audit:docs --examples

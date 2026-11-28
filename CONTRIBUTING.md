@@ -73,7 +73,9 @@ PLAYWRIGHT_CHANNEL=chrome pnpm e2e      # use an installed Chrome instead
 ```
 
 Playwright starts the fixture dev server itself, so no prior `pnpm build` is
-needed. `e2e.yml` runs the same suite on pull requests that touch a binding,
+needed. `pnpm audit:docs` then checks the numbers on the
+[accessibility audit](docs/reference/a11y-audit.md) against the specs and a run
+report (`--examples` for the example deck suite); CI runs it in `e2e.yml`. `e2e.yml` runs the same suite on pull requests that touch a binding,
 nightly, and on demand (`gh workflow run e2e.yml --ref main`) — a push to `main`
 does not trigger it, so dispatch it after merging binding work.
 

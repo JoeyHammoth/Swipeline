@@ -86,6 +86,11 @@ jobs:
       - name: Publish checker regression tests
         run: pnpm publish:check:test
 
+      # The checker itself runs after the browser suite in e2e.yml; its tests can
+      # run anywhere.
+      - name: Audit docs checker regression tests
+        run: pnpm audit:docs:test
+
       - name: Adapter registry is valid and the catalog matches it
         run: pnpm registry:check
 

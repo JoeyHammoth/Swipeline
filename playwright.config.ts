@@ -10,7 +10,14 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
-  reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
+  reporter: process.env.CI
+    ? [
+        ['github'],
+        ['html', { open: 'never' }],
+        // `pnpm audit:docs` compares the audit page with this summary.
+        ['json', { outputFile: 'test-results/audit-fixtures.json' }],
+      ]
+    : 'list',
   use: {
     baseURL: `http://${HOST}:${PORT}`,
     trace: 'retain-on-failure',
