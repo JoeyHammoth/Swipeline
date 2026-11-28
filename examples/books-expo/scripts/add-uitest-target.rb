@@ -32,8 +32,18 @@ target.source_build_phase.add_file_reference(group.new_file('SmokeUITests.swift'
 
 target.build_configurations.each do |configuration|
   settings = configuration.build_settings
+  # Xcodeproj has no default settings table for a UI test bundle, so an unset
+  # PRODUCT_NAME makes the test bundle and its generated runner app collide on the
+  # empty name: "Multiple commands produce .../-Runner.app/PlugIns/.xctest".
+  settings['PRODUCT_NAME'] = '$(TARGET_NAME)'
   settings['TEST_TARGET_NAME'] = app.name
   settings['PRODUCT_BUNDLE_IDENTIFIER'] = "dev.swipeline.expo.#{TEST_NAME}"
+  settings['LD_RUNPATH_SEARCH_PATHS'] = [
+    '$(inherited)',
+    '@executable_path/Frameworks',
+    '@loader_path/Frameworks',
+  ]
+  settings['SKIP_INSTALL'] = 'YES'
   settings['GENERATE_INFOPLIST_FILE'] = 'YES'
   settings['CODE_SIGNING_ALLOWED'] = 'NO'
   # Swift 5 mode: the test makes no concurrency claims, and Swift 6 mode would

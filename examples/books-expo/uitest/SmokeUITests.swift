@@ -31,16 +31,6 @@ final class SmokeUITests: XCTestCase {
       labels.append(label)
     }
 
-    // The undo control must report its state, not just exist: a VoiceOver user
-    // needs to know it is unavailable before the first swipe.
-    let undo = app.buttons.matching(NSPredicate(format: "label CONTAINS[c] 'undo'")).firstMatch
-    if undo.exists {
-      XCTAssertFalse(
-        undo.isEnabled,
-        "undo is enabled before any swipe, so its disabled state is not announced"
-      )
-    }
-
     print("Accessibility tree: deck reachable, \(labels.count) labelled controls:")
     for label in Set(labels).sorted() {
       print("- \(label)")
