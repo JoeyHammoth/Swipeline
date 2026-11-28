@@ -16,7 +16,9 @@ runtime:
 
 - `.github/workflows/android.yml` prebuilds, assembles the release APK, installs
   it on an emulator and fails unless `uiautomator` sees the like on screen
-  (`scripts/android-smoke.sh`).
+  (`scripts/android-smoke.sh`). It then reads the accessibility tree and fails
+  unless the deck root and at least three controls expose labels — what TalkBack
+  would be offered, though TalkBack itself is not driven.
 - `.github/workflows/ios.yml` prebuilds, builds a Release app with `xcodebuild`,
   installs it on an iPhone simulator and reads `Documents/smoke.txt` from the app
   container (`scripts/ios-smoke.sh`) — a release build's `console.log` never

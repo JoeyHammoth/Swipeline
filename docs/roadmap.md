@@ -86,9 +86,9 @@ deck, no framework imports outside binding packages, playground v0 live.
 - [x] Adapter registry: schema-validated, with a generated docs catalog
 - [ ] Accessibility audit — automated axe (WCAG 2.0/2.1/2.2, A/AA), the
   keyboard, reflow, target-size, forced-colours and reduced-motion checks, the
-  example decks (nightly) and the token-contrast table all pass; the
-  screen-reader and touch checklist in [the audit](reference/a11y-audit.md) is
-  not done
+  example decks (nightly), the token-contrast table and the native deck's
+  labelled controls all pass; the screen-reader and touch checklist in
+  [the audit](reference/a11y-audit.md) is not done
 - [x] OpenAPI specification for the server (`GET /openapi.json`)
 - [x] Theming kit: `@swipeline/theme` with both palettes and CSS output
 - [x] i18n catalog: `@swipeline/i18n`, wired into both bindings

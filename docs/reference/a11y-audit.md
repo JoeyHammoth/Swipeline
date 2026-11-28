@@ -10,7 +10,7 @@ This page records results from a run, not intentions.
 | Binding fixture pages (`/react.html`, `/element.html`, `/vue.html`, `/svelte.html`) | Yes | axe + the audit suite + binding conformance | Not done |
 | Card templates (`text`, `media`, `facts`) as rendered by the bindings | Yes, through the fixtures | axe + conformance | Not done |
 | Example apps (`books-react`, `recipes-react`, `movies-tmdb`, `papers-html`) | Yes, nightly | axe via `pnpm e2e:examples` | Not done |
-| React Native (`examples/books-expo`) | Android and iOS, weekly | launches and reports its like (`android.yml`, `ios.yml`); no axe | Not done |
+| React Native (`examples/books-expo`) | Android and iOS, weekly | launches, reports its like, and (Android) labelled controls in the accessibility tree (`android.yml`, `ios.yml`); no axe | Not done |
 
 ## Automated results
 
@@ -131,8 +131,11 @@ Each item is unverified until someone with the tool records the result here.
   [Token contrast](#token-contrast) — but a themed palette is not measured.
 - **The native deck is not scanned.** `android.yml` and `ios.yml` show that the
   React Native deck launches and swipes on an Android emulator and an iOS
-  simulator; no axe-equivalent check runs against it, and neither platform has
-  had a screen reader attached.
+  simulator, and the Android job reads the platform's accessibility tree: it
+  fails unless the deck root and at least three controls expose labels. That is
+  what a screen reader is offered, not how it reads it — no TalkBack or VoiceOver
+  pass exists, no axe-equivalent rule set runs against native, and iOS has no
+  equivalent tree check on this runner.
 - **Hydration.** Server-rendered markup is not compared against the hydrated tree,
   so a mismatch that reorders focusable elements would not be caught.
 - **Assistive technology.** Everything in the manual checklist above is still

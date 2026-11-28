@@ -37,9 +37,11 @@ lockfile, plus nightly and on demand. The jsdom suites run in `ci.yml` on every 
 - **Hydration equality.** `packages/react/test/ssr.test.tsx` proves the React
   binding renders on the server without a DOM; it does not compare a hydrated tree
   against the server markup.
-- **Touch input.** Browser conformance runs Chromium with mouse pointer events,
-  and the native jobs drive the engine rather than a finger. Real touch and
-  assistive-technology testing is manual.
+- **Touch input and assistive technology.** Browser conformance runs Chromium
+  with mouse pointer events, and the native jobs drive the engine rather than a
+  finger. The Android job does assert that the deck root and at least three
+  controls carry labels in the accessibility tree; how a screen reader speaks
+  them is still a manual pass.
 - **React Native.** The binding has no jsdom or browser suite: React Native is
   Flow source that Node cannot load, so its render tests run against a mocked
   `react-native` module, and the drag itself is covered only through
