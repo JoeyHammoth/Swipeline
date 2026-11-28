@@ -115,10 +115,15 @@ Two workflows run it for real, weekly and on demand:
   Swift 6.2 that `ExpoModulesJSI` needs), boots an iPhone simulator, installs and
   launches. A release build's `console.log` never reaches the simulator log, so
   the app writes its result into its own Documents directory and the job reads it
-  with `simctl get_app_container`.
+  with `simctl get_app_container`. It then adds a UI test target to the generated
+  project and reads the accessibility tree, failing if fewer than three labelled
+  controls appear or any control is unlabelled.
 
-Both green on 2026-11-27 — the iOS run reported `pass: liked "Project Hail
-Mary"`. No screen reader has been attached on either platform, so announcements
-and layout as a person sees it are still unverified. See
+Both green — Android on 2026-11-27 and iOS on 2026-11-28, where the run reported
+`pass: liked "Project Hail Mary"` and the same five labelled controls the Android
+tree shows. A screen reader has still not been attached on either platform, so
+what it says and how the layout reads to a person are unverified; the
+[screen-reader script](/reference/a11y-manual-script) is the pass that closes
+that. See
 [Binding status](/reference/binding-status) and the
 [accessibility audit](/reference/a11y-audit).

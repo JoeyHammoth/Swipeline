@@ -39,9 +39,9 @@ lockfile, plus nightly and on demand. The jsdom suites run in `ci.yml` on every 
   against the server markup.
 - **Touch input and assistive technology.** Browser conformance runs Chromium
   with mouse pointer events, and the native jobs drive the engine rather than a
-  finger. The Android job does assert that the deck root and at least three
-  controls carry labels in the accessibility tree; how a screen reader speaks
-  them is still a manual pass.
+  finger. Both native jobs assert that at least three controls carry labels in the
+  platform's accessibility tree; how a screen reader speaks them is still a manual
+  pass.
 - **React Native.** The binding has no jsdom or browser suite: React Native is
   Flow source that Node cannot load, so its render tests run against a mocked
   `react-native` module, and the drag itself is covered only through
@@ -49,8 +49,10 @@ lockfile, plus nightly and on demand. The jsdom suites run in `ci.yml` on every 
   emulator (`android.yml`) and an iOS simulator (`ios.yml`), weekly and on
   demand: the release build installs, launches and reports the scripted swipe's
   like — on screen for Android, in a file for iOS — and both jobs fail if it does
-  not. Both green on 2026-11-27. **No screen reader has been attached**, and no
-  person has looked at the layout.
+  not. Both green as of 2026-11-28, and both now read the platform's accessibility
+  tree for labels. **No screen reader has been attached**, and no person has
+  looked at the layout; the
+  [screen-reader script](/reference/a11y-manual-script) is the pass that would.
 
 ## Adding a row
 

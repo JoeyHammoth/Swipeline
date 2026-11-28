@@ -23,7 +23,9 @@ runtime:
   installs it on an iPhone simulator and reads `Documents/smoke.txt` from the app
   container (`scripts/ios-smoke.sh`) — a release build's `console.log` never
   reaches the simulator log, so the app writes its result to that file as well as
-  to the screen.
+  to the screen. It then adds a UI test target to the generated project and reads
+  the iOS accessibility tree, failing unless at least three controls carry labels
+  and no control is unlabelled.
 
 The deck is a local fixture rather than the shared `examples/shared/decks.ts`
 factory, so a smoke result never depends on a remote API. The rest of the example

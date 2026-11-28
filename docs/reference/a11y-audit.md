@@ -10,7 +10,7 @@ This page records results from a run, not intentions.
 | Binding fixture pages (`/react.html`, `/element.html`, `/vue.html`, `/svelte.html`) | Yes | axe + the audit suite + binding conformance | Not done |
 | Card templates (`text`, `media`, `facts`) as rendered by the bindings | Yes, through the fixtures | axe + conformance | Not done |
 | Example apps (`books-react`, `recipes-react`, `movies-tmdb`, `papers-html`) | Yes, nightly | axe via `pnpm e2e:examples` | Not done |
-| React Native (`examples/books-expo`) | Android and iOS, weekly | launches, reports its like, and (Android) labelled controls in the accessibility tree (`android.yml`, `ios.yml`); no axe | Not done |
+| React Native (`examples/books-expo`) | Android and iOS, weekly | launches, reports its like, and labelled controls in the accessibility tree on both platforms (`android.yml`, `ios.yml`); no axe | Not done |
 
 ## Automated results
 
@@ -51,6 +51,20 @@ and that state must still pass.
 
 Last run 2026-11-27: 4/4 pages, 0 violations. Getting there required the three
 fixes recorded below.
+
+## Native decks (weekly)
+
+`examples/books-expo` builds a release app and drives it on both platforms. Last
+runs: Android 2026-11-27 (`android.yml` 46089762260) and iOS 2026-11-28
+(`ios.yml` 46096448443).
+
+Both print the same five labels from the platform's accessibility tree —
+`Dislike (Left)`, `Later (Down)`, `Like (Right)`, `Superlike (Up)` and
+`Undo last swipe (U)` — and fail if fewer than three labelled controls appear.
+The iOS run also fails if any control is exposed without a label. Android reads
+`uiautomator`'s dump; iOS runs an XCTest that reads the live tree. Neither drives
+a screen reader, so this records what VoiceOver and TalkBack are offered, not
+what they say.
 
 ## Token contrast
 
@@ -134,11 +148,10 @@ a result.
   [Token contrast](#token-contrast) — but a themed palette is not measured.
 - **The native deck is not scanned.** `android.yml` and `ios.yml` show that the
   React Native deck launches and swipes on an Android emulator and an iOS
-  simulator, and the Android job reads the platform's accessibility tree: it
-  fails unless the deck root and at least three controls expose labels. That is
-  what a screen reader is offered, not how it reads it — no TalkBack or VoiceOver
-  pass exists, no axe-equivalent rule set runs against native, and iOS has no
-  equivalent tree check on this runner.
+  simulator, and both jobs read the platform's accessibility tree: each fails
+  unless at least three controls expose labels. That is what a screen reader is
+  offered, not how it reads it — no TalkBack or VoiceOver pass exists, and no
+  axe-equivalent rule set runs against native.
 - **Hydration.** Server-rendered markup is not compared against the hydrated tree,
   so a mismatch that reorders focusable elements would not be caught.
 - **Assistive technology.** Everything in the manual checklist above is still
